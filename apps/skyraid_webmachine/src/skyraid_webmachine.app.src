@@ -1,0 +1,12 @@
+{application, skyraid_webmachine,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { skyraid_webmachine_app, []}},
+  {env, []}
+ ]}.
