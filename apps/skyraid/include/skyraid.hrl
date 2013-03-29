@@ -1,7 +1,7 @@
 
 -record(skr_user, 
 {
-	uid :: string(),
+	uid = make_ref() :: reference(),
 	username :: string(),
 	password :: string(),
 	display_name :: string(),

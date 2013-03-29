@@ -1,1 +1,1 @@
-erl -pa ../deps/*/ebin -pa ../ebin -s skyraid
+erl -pa ../deps/*/ebin -pa ../apps/*/ebin -s reloader -s skyraid
