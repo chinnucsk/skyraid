@@ -2,10 +2,13 @@
 
 -include_lib("skyraid.hrl").
 
--export([new/1, get_all/0]).
+-export([new/1, get_all/0, get_user/1]).
 
 new(#skr_user{}=User) ->
 	skyraid_db:create_user(User).
 
 get_all() ->
 	skyraid_db:get_users().	
+
+get_user(Username) ->
+	skyraid_db:get_user(Username).

@@ -1,17 +1,22 @@
 -module(skyraid_db).
 
--incluse("skyraid.hrl").
+-include("skyraid.hrl").
 
--export([init/0, create_user/1, create_storage_provider/1]).
+-define(db, skyraid_db_test).
+
+-export([init/0, create_user/1, create_storage_provider/1, get_users/0, get_user/1]).
 
 init() ->
-	skyraid_db_test:init().
+	?db:init().
 
 get_users() ->
-	skyraid_db_test:get_users().
+	?db:get_users().
+
+get_user(Username) ->
+	?db:get_user(Username).
 
 create_user(User) ->
-	skyraid_db_test:create_user(User).
+	?db:create_user(User).
 
 create_storage_provider(Provider) ->
-	skyraid_db_test:create_storage_provider(Provider).	
+	?db:create_storage_provider(Provider).	
