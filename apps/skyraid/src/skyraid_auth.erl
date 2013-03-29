@@ -21,12 +21,14 @@ logout(_SessionID) ->
 	ok.
 
 validate(Username, Password) ->
-	{ok, U} = skyraid_user_repo:get_user(Username),
-	case {U#skr_user.username, U#skr_user.password} of
-		{Username, Password} -> 
-			{ok, U};
-		{Username, _} ->
-			{error, invalid_password};
-		{_, _} ->
+	 case skyraid_user_repo:get_user(Username) of
+	 	{ok, U} ->
+			case {U#skr_user.username, U#skr_user.password} of
+				{Username, Password} -> 
+					{ok, U};
+				{Username, _} ->
+					{error, invalid_password}
+			end;
+		not_found ->
 			{error, invalid_username_password}
 	end.

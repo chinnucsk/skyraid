@@ -13,7 +13,7 @@ skyraid_test_() ->
 			?T(register_normal),
 			?T(login_normal),
 			?T(login_invalid_password),
-			?T(login_ivalid_username_password)
+			?T(login_invalid_username_password)
 		] 
 	}.
 
@@ -36,5 +36,5 @@ login_normal() ->
 login_invalid_password() ->
 	?assertEqual({error, invalid_password}, skyraid:login("Adam", "sdfdsfdsf")).
 
-login_ivalid_username_password() ->
-	?assertEqual({error, invalid_uername_password}, skyraid:login("sdasd", "sdfdf")).	
+login_invalid_username_password() ->
+	?assertEqual({error, invalid_username_password}, skyraid:login("sdasd", "sdfdf")).	
