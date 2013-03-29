@@ -31,7 +31,9 @@ register_normal() ->
 	?assertEqual(ok, skyraid:register(User)).
 
 login_normal() ->
-	{ok, _Session} = skyraid:login("Adam", "test").
+	{ok, Session} = skyraid:login("Adam", "test"),
+	{ok, I} = skyraid_user_session:info(Session),
+	?assertEqual(I#skr_session_info.user#skr_user.username, "Adam").
 
 login_invalid_password() ->
 	?assertEqual({error, invalid_password}, skyraid:login("Adam", "sdfdsfdsf")).

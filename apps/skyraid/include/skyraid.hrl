@@ -10,6 +10,13 @@
 }).
 -type skr_user() :: #skr_user{}.
 
+-record(skr_session_info, 
+{
+	timestamp :: term(),
+	user :: skr_user()
+}).
+-type skr_session_info() :: #skr_session_info{}.
+
 
 -record(skr_quota_info,
 {

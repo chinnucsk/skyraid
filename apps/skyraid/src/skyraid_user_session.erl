@@ -3,6 +3,7 @@
 %% @doc Handles all request for a single authenticated user
 %%
 -module(skyraid_user_session).
+-include("skyraid.hrl").
 -behaviour(gen_server).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
@@ -15,12 +16,16 @@ start_link(User) ->
 	gen_server:start_link(?MODULE, [User], []).
 
 info(SessionRef) when is_pid(SessionRef) ->
-	gen_server:call(SessionRef, get_user_info).
+	gen_server:call(SessionRef, get_info).
 
 %% ====================================================================
 %% State 
 %% ====================================================================
--record(state, {user}).
+-record(state, 
+{
+    timestamp = erlang:now(),
+    user
+}).
 
 %% ====================================================================
 %% Behavioural functions 
@@ -29,8 +34,9 @@ info(SessionRef) when is_pid(SessionRef) ->
 init([User]) ->
     {ok, #state{user=User}}.
 
-handle_call(get_user_info, _From, #state{user=User}=State) ->
-	{reply, User, State};
+handle_call(get_info, _From, S) ->
+    Info = #skr_session_info{timestamp = S#state.timestamp, user = S#state.user},
+	{reply, {ok, Info}, S};
 
 handle_call(_Request, _From, State) ->
     Reply = ok,
