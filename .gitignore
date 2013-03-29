@@ -1,5 +1,3 @@
 deps/
-apps/skyraid/.eunit
-apps/skyraid/ebin
-apps/skyraid_webmachine/ebin
-apps/skyraid_webmachine/.eunit
+apps/*/.eunit
+apps/*/ebin
