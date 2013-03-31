@@ -1,37 +1,30 @@
 %% Copyright
 %%
-%% @doc Supervisor for user sessions
+%% @doc desc
 %%
 
--module(skyraid_user_session_sup).
+-module(skyraid_fileop_sup).
 -behaviour(supervisor).
-
--include("skyraid.hrl").
-
 -export([init/1]).
 
-%% Helper macro for declaring children of supervisor
--define(CHILD(Id, User), {Id, {skyraid_user_session, start_link, [User]}, temporary, 5000, worker, [skyraid_user_session]}).
-
+-define(CHILD(Id, FileName, Opts), {Id, {skyraid_fileop2, start_link, [FileName, Opts]}, temporary, 5000, worker, [skyraid_fileop2]}).
 %% ====================================================================
 %% API functions
 %% ====================================================================
--export([start_link/0, start_session/1]).
+-export([start_link/0, start_fileop/2]).
 
 start_link() ->
 	supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
-start_session(User = #skr_user{uid=UID}) ->
-	supervisor:start_child(?MODULE, ?CHILD(UID, User)).
-
+start_fileop(FileName, Opts) ->
+	supervisor:start_child(?MODULE, ?CHILD(make_ref(), FileName, Opts)).
 %% ====================================================================
 %% Behavioural functions 
 %% ====================================================================
 
 init([]) ->
-    {ok,{{one_for_one,5,10}, []}}.
-	
+    {ok, {{one_for_one, 5, 10}, []}}.
 
 %% ====================================================================
 %% Internal functions
-%% ====================================================================		
+%% ====================================================================

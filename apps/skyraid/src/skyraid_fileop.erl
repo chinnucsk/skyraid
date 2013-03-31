@@ -1,15 +1,58 @@
+%% Copyright
+%%
+%% @doc desc
+%%
+
 -module(skyraid_fileop).
+-behaviour(gen_fsm).
+-export([init/1, state_name/2, state_name/3, handle_event/3, handle_sync_event/4, handle_info/3, terminate/3, code_change/4]).
 
--export([upload_start/1, upload_content/3, download_start/1, download_content/1]).
+%% ====================================================================
+%% API functions
+%% ====================================================================
+-export([start_link/2]).	
 
-upload_start(_FileName) ->
-	skyraid_fileop_upload:start_link().
+start_link(FileName, Opts) ->
+	gen_fsm:start_link(?MODULE, [FileName, Opts], []).
 
-upload_content(FileRef, Content, ChunkID) ->
-	skyraid_fileop_upload:content(FileRef, Content, ChunkID).
+%% ====================================================================
+%% State 
+%% ====================================================================
+-record(state, {
+	file :: string(),
+	opts
+}).
 
-download_start(_FileName) ->
-	skyraid_fileop_download:start_link().
+%% ====================================================================
+%% Behavioural functions 
+%% ====================================================================
 
-download_content(FileRef) ->
-	skyraid_fileop_download:download(FileRef).
+init([FileName, Opts]) ->
+    {ok, state_name, #state{file=FileName, opts=Opts}}.
+
+state_name(_Event, StateData) ->
+    {next_state, state_name, StateData}.
+
+state_name(_Event, _From, StateData) ->
+    Reply = ok,
+    {reply, Reply, state_name, StateData}.
+
+handle_event(_Event, StateName, StateData) ->
+    {next_state, StateName, StateData}.
+
+handle_sync_event(_Event, _From, StateName, StateData) ->
+    Reply = ok,
+    {reply, Reply, StateName, StateData}.
+
+handle_info(_Info, StateName, StateData) ->
+    {next_state, StateName, StateData}.
+
+terminate(_Reason, _StateName, _StatData) ->
+    ok.
+
+code_change(_OldVsn, StateName, StateData, _Extra) ->
+    {ok, StateName, StateData}.
+
+%% ====================================================================
+%% Internal functions
+%% ====================================================================

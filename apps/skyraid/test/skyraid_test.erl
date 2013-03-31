@@ -13,7 +13,8 @@ skyraid_test_() ->
 			?T(register_normal),
 			?T(login_normal),
 			?T(login_invalid_password),
-			?T(login_invalid_username_password)
+			?T(login_invalid_username_password),
+			?T(write_file_normal)
 		] 
 	}.
 
@@ -40,3 +41,7 @@ login_invalid_password() ->
 
 login_invalid_username_password() ->
 	?assertEqual({error, invalid_username_password}, skyraid:login("sdasd", "sdfdf")).	
+
+write_file_normal() ->
+	{ok, Session} = skyraid:login("Adam", "test"),
+	ok = skyraid:file_write(Session, "myfile.txt", <<"hello world">>, [{storage, [local]}]).

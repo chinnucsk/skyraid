@@ -10,7 +10,10 @@
 authenticate(Username, Password) ->
 	case validate(Username, Password) of
 		{ok, User} ->
-			skyraid_user_session_sup:start_session(User);
+			case skyraid_user_session_sup:start_session(User) of
+				{ok, Pid} -> {ok, Pid};
+				{error, {already_started, Pid}} -> {ok, Pid}
+			end;
 		Any -> Any
 	end.
 
