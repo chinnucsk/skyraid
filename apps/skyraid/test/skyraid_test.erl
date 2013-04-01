@@ -14,7 +14,8 @@ skyraid_test_() ->
 			?T(login_normal),
 			?T(login_invalid_password),
 			?T(login_invalid_username_password),
-			?T(write_file_normal)
+			?T(write_file_normal),
+			?T(read_file_normal)
 		] 
 	}.
 
@@ -44,4 +45,9 @@ login_invalid_username_password() ->
 
 write_file_normal() ->
 	{ok, Session} = skyraid:login("Adam", "test"),
-	ok = skyraid:file_write(Session, "myfile.txt", <<"hello world">>, [{storage, [local]}]).
+	?assertEqual(ok, skyraid:file_write(Session, "myfile.txt", <<"hello world">>, [{storage, [local]}])).
+
+read_file_normal() ->
+	{ok, Session} = skyraid:login("Adam", "test"),
+	ok = skyraid:file_write(Session, "ReadFile.txt", <<"hello world">>, [{storage, [local]}]),
+	?assertEqual({ok, <<"hello world">>}, skyraid:file_read(Session, "ReadFile.txt", [{storage, [local]}])).
