@@ -1,7 +1,7 @@
 
 -record(skr_user, 
 {
-	uid = make_ref() :: reference(),
+	uid = erlang:ref_to_list(make_ref()) :: reference(),
 	username :: string(),
 	password :: string(),
 	display_name :: string(),

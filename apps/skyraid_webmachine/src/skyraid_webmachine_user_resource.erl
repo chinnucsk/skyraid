@@ -30,8 +30,9 @@ resource_exists(ReqData, Context) ->
 to_json(_ReqData, []) ->
 	{"", _ReqData, []};
 
-to_json(ReqData, Users) when is_list(Users)->
-	{ ?list_to_json(skr_user, Users), ReqData, Users};
+to_json(ReqData, [User]) ->
+	{ ?record_to_json(skr_user, User), ReqData, User};
 
-to_json(ReqData, User) ->
-	{ ?record_to_json(skr_user, User), ReqData, User}.
+to_json(ReqData, Users) when is_list(Users)->
+	{ ?list_to_json(skr_user, Users), ReqData, Users}.
+

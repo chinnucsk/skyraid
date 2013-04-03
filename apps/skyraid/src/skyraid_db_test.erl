@@ -11,7 +11,10 @@ init() ->
 	ok.
 
 get_users() ->
-	ets:tab2list(users).
+	case ets:tab2list(users) of
+		Users -> {ok, Users}
+	end.
+
 
 get_user(Username)->
 	case ets:lookup(users, Username) of
