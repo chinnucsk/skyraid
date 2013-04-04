@@ -14,6 +14,7 @@ skyraid_test_() ->
 			?T(login_normal),
 			?T(login_invalid_password),
 			?T(login_invalid_username_password),
+			?T(logout_normal),
 			?T(write_file_normal),
 			?T(read_file_normal)
 		] 
@@ -42,6 +43,12 @@ login_invalid_password() ->
 
 login_invalid_username_password() ->
 	?assertEqual({error, invalid_username_password}, skyraid:login("sdasd", "sdfdf")).	
+
+logout_normal() ->
+	{ok, Session} = skyraid:login("Adam", "test"),
+	{ok, _Info} = skyraid_user_session:info(Session),
+	ok = skyraid:logout(Session),
+	?assertException(exit, _, skyraid_user_session:info(Session)).
 
 write_file_normal() ->
 	{ok, Session} = skyraid:login("Adam", "test"),

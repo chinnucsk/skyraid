@@ -18,10 +18,10 @@ authenticate(Username, Password) ->
 	end.
 
 authenticate(_Token) ->
-	ok.
+	not_implemented.
 
-logout(_SessionID) ->
-	ok.
+logout(SessionRef) ->
+	skyraid_user_session_sup:stop_session(SessionRef).
 
 validate(Username, Password) ->
 	 case skyraid_user_repo:get_user(Username) of
