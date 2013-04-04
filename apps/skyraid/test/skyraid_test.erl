@@ -15,6 +15,7 @@ skyraid_test_() ->
 			?T(login_invalid_password),
 			?T(login_invalid_username_password),
 			?T(logout_normal),
+			?T(write_chunked_normal),
 			?T(write_file_normal),
 			?T(read_file_normal)
 		] 
@@ -49,6 +50,16 @@ logout_normal() ->
 	{ok, _Info} = skyraid_user_session:info(Session),
 	ok = skyraid:logout(Session),
 	?assertException(exit, _, skyraid_user_session:info(Session)).
+
+write_chunked_normal() ->
+	{ok, Session} = skyraid:login("Adam", "test"),
+	{ok, FileRef} = skyraid:file_open(Session, "Chunked.txt", [{storage, [local]}]),
+	skyraid:file_write(FileRef, <<"Rad1\n">>),
+	skyraid:file_write(FileRef, <<"Rad2\n">>),
+	skyraid:file_write(FileRef, <<"Rad3\n">>),
+	skyraid:file_close(FileRef),
+	{ok, <<"Rad1\nRad2\nRad3\n">>} = skyraid:file_read(Session, "Chunked.txt", [{storage, [local]}]).
+
 
 write_file_normal() ->
 	{ok, Session} = skyraid:login("Adam", "test"),

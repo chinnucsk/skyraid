@@ -5,25 +5,24 @@
 %% ====================================================================
 -export([open/3, close/1, write/2, write_file/4, read/1, read_file/3]).
 
-open(_Session, _FileName, _Opts) ->
-	not_implemented.
-	%{ok, Pid} = skyraid_fileop_sup:start_fileop(FileName, Opts).
-	%link(Session, Pid),
-	%{ok, Session}.
+open(Session, FileName, Opts) ->
+	Storage = get_storage(Opts),
+	{ok, Ref} = skyraid_storage:file_open(Storage, Session, FileName, Opts),
+	{ok, {Storage, Ref}}.
 
-close(FileRef) ->
-	skyraid_fileop:stop(FileRef).
+close(_FileRef={Storage, Ref}) ->
+	skyraid_storage:file_close(Storage, Ref).
 
-write(FileRef, Content) ->
-	skyraid_fileop:write(FileRef, Content).
+write(_FileRef={Storage, Ref}, Content) ->
+	skyraid_storage:file_write(Storage, Ref, Content).
 
 write_file(Session, FileName, Content, Opts) ->
 	StorageList = get_storages(Opts),
 	Result = [{skyraid_storage:write_file(S, Session, FileName, Content, Opts), S} || S<-StorageList],
 	validate(Result).
 
-read(FileRef) ->
-	skyraid_fileop:read(FileRef).
+read(_FileRef={Storage, Ref}) ->
+	skyraid_storage:file_read(Storage, Ref).
 
 read_file(Session, FileName, Opts) ->
 	Storage = get_storage(Opts),
