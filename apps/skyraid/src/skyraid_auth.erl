@@ -17,8 +17,19 @@ authenticate(Username, Password) ->
 		Any -> Any
 	end.
 
-authenticate(_Token) ->
-	not_implemented.
+authenticate(Storage) when is_atom(Storage) ->
+	case Storage of
+		dropbox -> 
+			{ok, {Url, {request_token, T}}} = skyraid_storage_dropbox:authorize_url(),
+			{ok, {Url, {request_token, {dropbox, T}}}};
+		_ -> invalid_storage
+	end;
+
+authenticate({Storage, RequestToken}) ->
+	case Storage of
+		dropbox -> skyraid_storage_dropbox:access_token(RequestToken);
+		_ -> invalid_storage
+	end.
 
 logout(SessionRef) ->
 	skyraid_user_session_sup:stop_session(SessionRef).

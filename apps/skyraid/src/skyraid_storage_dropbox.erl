@@ -8,10 +8,11 @@
 
 authorize_url() ->
 	T = [{"oauth_token_secret", _TokenSecret}, {"oauth_token", Token}] = request_token(),
-	{{url, ?auth_url ++ Token}, {request_token, T}}.
+	{ok, {{url, ?auth_url ++ Token}, {request_token, T}}}.
 
 access_token([{"oauth_token_secret", TokenSecret}, {"oauth_token", Token}]) ->
-	dropbox:access_token(?key, ?secret, Token, TokenSecret).
+	AccessToken = dropbox:access_token(?key, ?secret, Token, TokenSecret),
+	{ok, {access_token, AccessToken}}.
 
 account_info([{"oauth_token_secret", TokenSecret}, {"oauth_token", Token}, {"uid", _Uid}]) ->
 	dropbox:account_info(?key, ?secret, Token, TokenSecret).
@@ -22,6 +23,3 @@ account_info([{"oauth_token_secret", TokenSecret}, {"oauth_token", Token}, {"uid
 
 request_token() ->
 	dropbox:request_token(?key, ?secret).
-
-	
-

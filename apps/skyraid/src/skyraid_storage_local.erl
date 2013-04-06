@@ -19,11 +19,11 @@ write_file(Session, FileName, Content, _Opts) ->
 
 read_file(Session, FileName, _Opts) ->
 	{ok, S} = skyraid_user_session:info(Session),
-	Path = "data/test/" ++ S#skr_session_info.user#skr_user.username ++ "/",
+	Path = "data/test/" ++ binary_to_list(S#skr_session_info.user#skr_user.username) ++ "/",
 	FilePath = filename:join(Path, FileName),
 	file:read_file(FilePath).
 
 file(Session, FileName) ->
 	{ok, S} = skyraid_user_session:info(Session),
-	Path = "data/test/" ++ S#skr_session_info.user#skr_user.username ++ "/",
+	Path = "data/test/" ++ binary_to_list(S#skr_session_info.user#skr_user.username) ++ "/",
 	filename:join(Path, FileName).

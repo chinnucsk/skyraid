@@ -2,10 +2,10 @@
 -record(skr_user, 
 {
 	uid = erlang:ref_to_list(make_ref()) :: reference(),
-	username :: string(),
-	password :: string(),
-	display_name :: string(),
-	email :: string(),
+	username :: binary(),
+	password :: binary(),
+	display_name :: binary(),
+	email :: binary(),
 	storage :: [skr_storage()]
 }).
 -type skr_user() :: #skr_user{}.
@@ -26,18 +26,19 @@
 }).
 -type skr_quota_info() :: #skr_quota_info{}.
 
--record(skr_storage, 
+-record(skr_account, 
 {
-	storage_provider_id :: atom(),
+	id :: term(),
+	storage :: atom(),
 	token :: string(),
 	quota_info :: skr_quota_info()	
 }).
--type skr_storage() :: #skr_storage{}.
+-type skr_account() :: #skr_account{}.
 
 
--record(skr_storage_provider, 
+-record(skr_storage, 
 {
 	id :: atom(),
 	url :: string()
 }).
--type skr_storage_provider() :: #skr_storage_provider{}.
+-type skr_storage() :: #skr_storage{}.

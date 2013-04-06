@@ -13,14 +13,32 @@
 
 
 start() ->
+	ok = ensure_started(crypto),
+	ok = ensure_started(inets),
+	ok = ensure_started(public_key),
+	ok = ensure_started(ssl),
 	application:start(?MODULE).
 
 stop() ->
+	application:stop(crypto),
+	application:stop(inets),
+	application:stop(public_key),
+	application:stop(ssl),
 	application:stop(?MODULE).
 
 -spec register(skr_user()) -> ok | {error, term()}.
-register(User) ->
-	skyraid_user_repo:new(User).
+register(#skr_user{} = User) ->
+	skyraid_user_repo:new(User);
+
+register(AccountProvider) ->
+	case skyraid_auth:authenticate(AccountProvider) of
+		{ok, {access_token, Token}} ->
+			{ok, Account} = skyraid_storage:account_info(Token),
+			ok = skyraid_account_repo:new(Account),
+			login(Token);
+		Any -> Any
+	end.
+
 
 -spec login(string(), string()) -> {ok, session_ref()} | {error, term()}.
 login(Username, Password) ->
@@ -61,3 +79,10 @@ file_read(FileRef) ->
 -spec file_read(session_ref(), string(), list()) -> ok | {error, term()}.
 file_read(SessionRef, FileName, Opts) ->
 	skyraid_file:read_file(SessionRef, FileName, Opts).
+
+
+ensure_started(App) ->
+    case application:start(App) of
+        ok ->ok;
+        {error, {already_started, App}} ->ok
+    end.

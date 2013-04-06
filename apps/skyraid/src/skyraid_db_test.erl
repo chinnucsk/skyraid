@@ -2,11 +2,11 @@
 
 -include("skyraid.hrl").
 
--export([init/0, create_user/1, create_storage_provider/1, get_users/0, get_user/1]).
+-export([init/0, create_user/1, create_storage/1, get_users/0, get_user/1]).
 
 init() ->
 	users = ets:new(users, [set, {keypos, 3}, named_table, public]),
-	storage_provider = ets:new(storage_provider, [set, named_table, public]),
+	storages = ets:new(storages, [set, named_table, public]),
 	insert_test_data(),
 	ok.
 
@@ -29,19 +29,19 @@ create_user(#skr_user{} = User) ->
 		Any-> {error, Any}
 	end.
 
-create_storage_provider(#skr_storage_provider{} = Provider) ->
-	ets:insert(storage_provider, Provider).
+create_storage(#skr_storage{} = Storage) ->
+	ets:insert(storages, Storage).
 
 insert_test_data() ->
-	Adam = #skr_user{username="Adam", 
-			  password="test", 
-			  display_name="AdamDisplay", 
-			  email="adam@gmail.com"},
+	Adam = #skr_user{username = <<"Adam">>, 
+			  password = <<"test">>, 
+			  display_name = <<"AdamDisplay">>, 
+			  email = <<"adam@gmail.com">>},
 
-	Eva = #skr_user{username="Eva", 
-	  password="test", 
-	  display_name="EvaDisplay", 
-	  email="adam@gmail.com"},
+	Eva = #skr_user{username = <<"Eva">>, 
+	  password = <<"test">>, 
+	  display_name = <<"EvaDisplay">>, 
+	  email = <<"adam@gmail.com">>},
 
 	ets:insert(users, Adam),
 	ets:insert(users, Eva).
