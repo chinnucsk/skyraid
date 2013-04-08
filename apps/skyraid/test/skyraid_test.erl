@@ -69,7 +69,6 @@ write_chunked_normal() ->
 	skyraid:file_close(FileRef),
 	{ok, <<"Rad1\nRad2\nRad3\n">>} = skyraid:file_read(Session, "Chunked.txt", [{storage, [local]}]).
 
-
 write_file_normal() ->
 	{ok, Session} = skyraid:login(<<"Adam">>, <<"test">>),
 	?assertEqual(ok, skyraid:file_write(Session, "myfile.txt", <<"hello world">>, [{storage, [local]}])).

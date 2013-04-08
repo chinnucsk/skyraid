@@ -25,9 +25,11 @@ authenticate(Storage) when is_atom(Storage) ->
 		_ -> invalid_storage
 	end;
 
-authenticate({Storage, RequestToken}) ->
+authenticate({request_token, {Storage, RequestToken}}) ->
 	case Storage of
-		dropbox -> skyraid_storage_dropbox:access_token(RequestToken);
+		dropbox -> 
+			{ok, {access_token, Token}} = skyraid_storage_dropbox:access_token(RequestToken),
+			{ok, {access_token, {dropbox, Token}}};
 		_ -> invalid_storage
 	end.
 

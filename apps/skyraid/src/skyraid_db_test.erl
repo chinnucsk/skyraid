@@ -3,9 +3,11 @@
 -include("skyraid.hrl").
 
 -export([init/0, create_user/1, create_storage/1, get_users/0, get_user/1]).
+-export([create_account/1, get_account/1, get_accounts/0]).
 
 init() ->
 	users = ets:new(users, [set, {keypos, 3}, named_table, public]),
+	accounts = ets:new(accounts, [set, named_table, public]),
 	storages = ets:new(storages, [set, named_table, public]),
 	insert_test_data(),
 	ok.
@@ -25,6 +27,21 @@ get_user(Username)->
 
 create_user(#skr_user{} = User) ->
 	case ets:insert(users, User) of 
+		true-> ok; 
+		Any-> {error, Any}
+	end.
+
+get_account(AccountID) ->
+	case ets:lookup(accounts, AccountID) of
+		[Account] -> {ok, Account};
+		[] -> not_found
+	end.
+
+get_accounts() ->
+	ets:tab2list(accounts).
+
+create_account(Account) ->
+	case ets:insert(accounts, Account) of 
 		true-> ok; 
 		Any-> {error, Any}
 	end.

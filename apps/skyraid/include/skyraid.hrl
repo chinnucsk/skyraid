@@ -6,7 +6,7 @@
 	password :: binary(),
 	display_name :: binary(),
 	email :: binary(),
-	storage :: [skr_storage()]
+	accounts :: [skr_account()]
 }).
 -type skr_user() :: #skr_user{}.
 
@@ -28,8 +28,13 @@
 
 -record(skr_account, 
 {
-	id :: term(),
-	storage :: atom(),
+	uid :: term(), %% The internal id of this account
+	ext_id :: binary(), %% The external id of this account(id at the provider)
+	user_id :: term(),
+	display_name :: binary(),
+	country :: binary(),
+	email :: binary(),
+	storage_id :: atom(),
 	token :: string(),
 	quota_info :: skr_quota_info()	
 }).

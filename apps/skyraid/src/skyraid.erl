@@ -2,7 +2,7 @@
 -include("skyraid.hrl").
 
 -export([
-	start/0, stop/0, 
+	start/0, stop/0, demo/0,
 	register/1, login/2, login/1, logout/1, 
 	user_info/1, 
 	file_open/3, file_close/1, file_write/2, file_write/4, file_read/1, file_read/3
@@ -11,7 +11,9 @@
 -type session_ref() :: any().
 -type file_ref() :: any().
 
-
+%% ===================================================================
+%% API Functions
+%% ===================================================================
 start() ->
 	ok = ensure_started(crypto),
 	ok = ensure_started(inets),
@@ -25,6 +27,9 @@ stop() ->
 	application:stop(public_key),
 	application:stop(ssl),
 	application:stop(?MODULE).
+
+demo() ->
+	start_demo().
 
 -spec register(skr_user()) -> ok | {error, term()}.
 register(#skr_user{} = User) ->
@@ -80,9 +85,38 @@ file_read(FileRef) ->
 file_read(SessionRef, FileName, Opts) ->
 	skyraid_file:read_file(SessionRef, FileName, Opts).
 
-
+%% ====================================================================
+%% Internal functions
+%% ====================================================================
 ensure_started(App) ->
     case application:start(App) of
         ok ->ok;
         {error, {already_started, App}} ->ok
     end.
+
+start_demo() ->
+	{ok, {{url, URL}, RT}} = skyraid:register(dropbox),
+	launch_user_authentication(URL),
+	{ok, AT} = skyraid:register(RT),
+	ok = skyraid_storage:account_info(AT).
+
+launch_user_authentication(URL) ->
+	Cmd = case os:type() of 
+			{win, _Osname} -> "start ";
+			{unix, _Osname} -> "epiphany "
+		end,
+
+	try open_port({spawn, Cmd ++ URL},[binary,{line, 255}]) of
+		Port -> await_user(Port)
+	catch
+		_ -> ok
+	end.
+
+await_user(Port) ->
+	receive 
+		{Port, Any} -> 
+			erlang:display(Any),
+			await_user(Port)
+	end. 
+
+

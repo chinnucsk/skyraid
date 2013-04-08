@@ -1,5 +1,7 @@
 -module(skyraid_account_repo).
 
+-include("skyraid.hrl").
+
 -export([new/1, all/0, get/1]).
 
 new(#skr_account{}=Account) ->
