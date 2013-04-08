@@ -1,6 +1,6 @@
 -module(skyraid_storage).
 
--export([authorize_url/1, access_token/2, account_info/1, file_open/4, file_close/2, file_write/3, write_file/5, read_file/4]).
+-export([authorize_url/1, access_token/2, account_info/1, file_list/1, file_open/4, file_close/2, file_write/3, write_file/5, read_file/4]).
 
 authorize_url(dropbox) ->
 	skyraid_storage_dropbox:authorize_url().
@@ -10,6 +10,9 @@ access_token(dropbox, RequestToken) ->
 
 account_info({dropbox, AccessToken}) ->
 	skyraid_storage_dropbox:account_info(AccessToken).
+
+file_list({dropbox, AccessToken}) ->
+	skyraid_storage_dropbox:list_files(AccessToken).
 
 file_open(local, Session, FileName, Opts) ->
 	skyraid_storage_local:file_open(Session, FileName, Opts).

@@ -29,7 +29,7 @@ stop() ->
 	application:stop(?MODULE).
 
 demo() ->
-	start_demo().
+	start_files_demo().
 
 -spec register(skr_user()) -> ok | {error, term()}.
 register(#skr_user{} = User) ->
@@ -40,7 +40,7 @@ register(AccountProvider) ->
 		{ok, {access_token, Token}} ->
 			{ok, Account} = skyraid_storage:account_info(Token),
 			ok = skyraid_account_repo:new(Account),
-			login(Token);
+			{ok, Token};
 		Any -> Any
 	end.
 
@@ -94,13 +94,20 @@ ensure_started(App) ->
         {error, {already_started, App}} ->ok
     end.
 
-start_demo() ->
+start_account_demo() ->
 	{ok, {{url, URL}, RT}} = skyraid:register(dropbox),
 	launch_user_authentication(URL),
 	{ok, AT} = skyraid:register(RT),
 	ok = skyraid_storage:account_info(AT).
 
+start_files_demo() ->
+	{ok, {{url, URL}, RT}} = skyraid:register(dropbox),
+	launch_user_authentication(URL),
+	{ok, AT} = skyraid:register(RT),
+	ok = skyraid_storage:file_list(AT).
+
 launch_user_authentication(URL) ->
+	process_flag(trap_exit, true),
 	Cmd = case os:type() of 
 			{win, _Osname} -> "start ";
 			{unix, _Osname} -> "epiphany "
@@ -109,14 +116,15 @@ launch_user_authentication(URL) ->
 	try open_port({spawn, Cmd ++ URL},[binary,{line, 255}]) of
 		Port -> await_user(Port)
 	catch
-		_ -> ok
+		_ -> erlang:display("Exception catched")
 	end.
 
 await_user(Port) ->
 	receive 
 		{Port, Any} -> 
 			erlang:display(Any),
-			await_user(Port)
+			await_user(Port);
+		Any -> erlang:display(Any)
 	end. 
 
 

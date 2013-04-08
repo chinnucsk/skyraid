@@ -10,7 +10,7 @@
 -define(secret, "obv1gjb2aoq1zg6").
 -define(auth_url, "https://www.dropbox.com/1/oauth/authorize?oauth_token=").
 
--export([authorize_url/0, access_token/1, account_info/1]).
+-export([authorize_url/0, access_token/1, account_info/1, list_files/1]).
 
 authorize_url() ->
 	T = [{"oauth_token_secret", _TokenSecret}, {"oauth_token", Token}] = request_token(),
@@ -25,6 +25,11 @@ account_info([{"oauth_token_secret", TokenSecret}, {"oauth_token", Token}, {"uid
 	Resp = jiffy:decode(Response),
 	{ok, to_account(Resp)}.
 
+list_files([{"oauth_token_secret", TokenSecret}, {"oauth_token", Token}, {"uid", _Uid}]) ->
+	Response = dropbox:metadata(?key, ?secret, Token, TokenSecret, "dropbox", ""),
+	Resp = jiffy:decode(Response),
+	{ok, to_files(Resp)}.
+
 %% ====================================================================
 %% Internal functions
 %% ====================================================================
@@ -33,20 +38,23 @@ request_token() ->
 	dropbox:request_token(?key, ?secret).
 
 to_account({Account}) ->
-	build(Account, #skr_account{}).
+	build_account(Account, #skr_account{}).
 
-build([], A) ->
+build_account([], A) ->
 	A;
-build([{<<"display_name">>, Value} | Rest], A) ->
-	build(Rest, A#skr_account{display_name=Value});
-build([{<<"uid">>, Value} | Rest], A) ->
-	build(Rest, A#skr_account{ext_id=Value});
-build([{<<"country">>, Value} | Rest], A) ->
-	build(Rest, A#skr_account{country=Value});
-build([{<<"quota_info">>, {[{<<"shared">>,Shared},{<<"quota">>,Quota},{<<"normal">>,Normal}]}} | Rest], A) ->
-	build(Rest, A#skr_account{quota_info=#skr_quota_info{shared=Shared, quota=Quota, normal=Normal}});
-build([_Any | R], A) ->
-	build(R, A).
+build_account([{<<"display_name">>, Value} | Rest], A) ->
+	build_account(Rest, A#skr_account{display_name=Value});
+build_account([{<<"uid">>, Value} | Rest], A) ->
+	build_account(Rest, A#skr_account{ext_id=Value});
+build_account([{<<"country">>, Value} | Rest], A) ->
+	build_account(Rest, A#skr_account{country=Value});
+build_account([{<<"quota_info">>, {[{<<"shared">>,Shared},{<<"quota">>,Quota},{<<"normal">>,Normal}]}} | Rest], A) ->
+	build_account(Rest, A#skr_account{quota_info=#skr_quota_info{shared=Shared, quota=Quota, normal=Normal}});
+build_account([_Any | R], A) ->
+	build_account(R, A).
+
+to_files({Files}) ->
+	ok = Files.
 
 
 %% ====================================================================
