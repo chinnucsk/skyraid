@@ -1,12 +1,14 @@
+-type session_ref() :: any().
+-type file_ref() :: any().
 
 -record(skr_user, 
 {
-	uid = erlang:ref_to_list(make_ref()) :: reference(),
+	id = erlang:ref_to_list(make_ref()) :: reference(),
 	username :: binary(),
 	password :: binary(),
 	display_name :: binary(),
 	email :: binary(),
-	accounts :: [skr_account()]
+	accounts = [] :: [skr_account()]
 }).
 -type skr_user() :: #skr_user{}.
 
@@ -28,14 +30,14 @@
 
 -record(skr_account, 
 {
-	uid :: term(), %% The internal id of this account
+	id :: term(), %% The internal id of this account
 	ext_id :: binary(), %% The external id of this account(id at the provider)
 	user_id :: term(),
 	display_name :: binary(),
 	country :: binary(),
 	email :: binary(),
 	storage_id :: atom(),
-	token :: string(),
+	authentication :: term(),
 	quota_info :: skr_quota_info()	
 }).
 -type skr_account() :: #skr_account{}.
@@ -47,3 +49,30 @@
 	url :: string()
 }).
 -type skr_storage() :: #skr_storage{}.
+
+%% ===================================================================
+%% Authentication records
+%% ===================================================================
+
+-record(skr_auth_basic,
+{
+	url :: string(),
+	provider :: atom(),
+	username :: binary(),
+	password :: binary()	
+}).
+
+-record(skr_auth_reqtoken, 
+{
+	url :: string(),
+	provider :: atom(),
+	token :: term()
+}).
+-type skr_auth_reqtoken() :: #skr_auth_reqtoken{}.
+
+-record(skr_auth_acctoken, 
+{
+	provider :: atom(),
+	token :: term()
+}).
+-type skr_auth_acctoken() :: #skr_auth_acctoken{}.

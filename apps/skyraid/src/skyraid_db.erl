@@ -2,7 +2,8 @@
 
 -include("skyraid.hrl").
 
--define(db, skyraid_db_test).
+-define(db, skyraid_db_ets).
+%%-define(db, skyraid_db_mnesia).
 
 -export([init/0, create_user/1, create_storage_provider/1, get_users/0, get_user/1]).
 -export([create_account/1, get_account/1, get_accounts/0]).

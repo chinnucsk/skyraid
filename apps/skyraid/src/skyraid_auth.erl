@@ -2,12 +2,25 @@
 
 -include("skyraid.hrl").
 
--export([authenticate/1, authenticate/2, logout/1]).
+-export([authenticate/1, login/1, login/2, logout/1]).
 
--type user_uid() :: binary().
 
--spec authenticate(string(), string()) -> {ok, user_uid()} | {error, invalid_password} | {error, invalid_username_password}.
-authenticate(Username, Password) ->
+authenticate(Provider) when is_atom(Provider) ->
+	case Provider of
+		dropbox -> skyraid_storage_dropbox:authorize_url();
+		google -> skyraid_storage_google:authorize_url();
+		_ -> invalid_storage
+	end;
+
+authenticate(#skr_auth_reqtoken{provider=Provider}=RT) ->
+	case Provider of
+		dropbox -> skyraid_storage_dropbox:access_token(RT);
+		google -> skyraid_storage_google:access_token(RT);
+		_ -> invalid_storage
+	end.
+
+-spec login(binary(), binary() | skr_auth_reqtoken()) -> {ok, session_ref()} | {error, invalid_password} | {error, invalid_username_password}.
+login(Username, Password) ->
 	case validate(Username, Password) of
 		{ok, User} ->
 			case skyraid_user_session_sup:start_session(User) of
@@ -17,20 +30,15 @@ authenticate(Username, Password) ->
 		Any -> Any
 	end.
 
-authenticate(Storage) when is_atom(Storage) ->
-	case Storage of
+login(#skr_auth_reqtoken{provider=Provider}=RT) ->
+	case Provider of
 		dropbox -> 
-			{ok, {Url, {request_token, T}}} = skyraid_storage_dropbox:authorize_url(),
-			{ok, {Url, {request_token, {dropbox, T}}}};
-		_ -> invalid_storage
-	end;
-
-authenticate({request_token, {Storage, RequestToken}}) ->
-	case Storage of
-		dropbox -> 
-			{ok, {access_token, Token}} = skyraid_storage_dropbox:access_token(RequestToken),
-			{ok, {access_token, {dropbox, Token}}};
-		_ -> invalid_storage
+			{ok, AT} = skyraid_storage_dropbox:access_token(RT),
+			{ok, #skr_account{id=ID}} = skyraid_storage_dropbox:account_info(AT),
+			{ok, #skr_account{user_id=UserID}} = skyraid_account_repo:get(ID),
+			{ok, User} = skyraid_user_repo:get_user_by_id(UserID),
+			skyraid_user_session_sup:start_session(User);
+		_ -> {error, invalid_provider}
 	end.
 
 logout(SessionRef) ->

@@ -21,12 +21,12 @@
 start_link() ->
 	supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
-start_session(User = #skr_user{uid=UID}) ->
-	supervisor:start_child(?MODULE, ?CHILD(UID, User)).
+start_session(User = #skr_user{id=ID}) ->
+	supervisor:start_child(?MODULE, ?CHILD(ID, User)).
 
 stop_session(SessionRef) ->
 	{ok, S} = skyraid_user_session:info(SessionRef),
-	supervisor:terminate_child(?MODULE, S#skr_session_info.user#skr_user.uid).
+	supervisor:terminate_child(?MODULE, S#skr_session_info.user#skr_user.id).
 
 %% ====================================================================
 %% Behavioural functions 

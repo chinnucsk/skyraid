@@ -26,4 +26,5 @@ read_file(Session, FileName, _Opts) ->
 file(Session, FileName) ->
 	{ok, S} = skyraid_user_session:info(Session),
 	Path = "data/test/" ++ binary_to_list(S#skr_session_info.user#skr_user.username) ++ "/",
+	filelib:ensure_dir(Path),
 	filename:join(Path, FileName).

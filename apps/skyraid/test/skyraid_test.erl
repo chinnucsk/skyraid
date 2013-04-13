@@ -12,10 +12,11 @@ skyraid_test_() ->
 		[
 			?T(register_normal),
 			?T(login_normal),
-			?T(login_dropbox),
+			%%?T(login_dropbox),
 			?T(login_invalid_password),
 			?T(login_invalid_username_password),
 			?T(logout_normal),
+			?T(add_account),
 			?T(write_chunked_normal),
 			?T(write_file_normal),
 			?T(read_file_normal)
@@ -23,10 +24,7 @@ skyraid_test_() ->
 	}.
 
 setup() ->
-	ok = application:start(inets),
-	ok = application:start(public_key),
-	ok = application:start(ssl),
-	ok = skyraid:start().
+	skyraid:start().
 
 teardown(_Any) ->
 	skyraid:stop().
@@ -44,7 +42,7 @@ login_normal() ->
 	?assertEqual(I#skr_session_info.user#skr_user.username, <<"Adam">>).
 
 login_dropbox() ->
-	{ok, {{url, _Url}, {request_token, Token}}} = skyraid:login(dropbox),
+	{ok, #skr_auth_reqtoken{token=Token}} = skyraid:login(dropbox),
 	{ok, _} = skyraid:login(Token).
 
 
@@ -59,6 +57,11 @@ logout_normal() ->
 	{ok, _Info} = skyraid_user_session:info(Session),
 	ok = skyraid:logout(Session),
 	?assertException(exit, _, skyraid_user_session:info(Session)).
+
+add_account() ->
+	{ok, Session} = skyraid:login(<<"Adam">>, <<"test">>),
+	{ok, #skr_auth_reqtoken{token=Token}} = skyraid:authenticate(dropbox),
+	{ok, Session} = skyraid:add_account(Session, Token).
 
 write_chunked_normal() ->
 	{ok, Session} = skyraid:login(<<"Adam">>, <<"test">>),

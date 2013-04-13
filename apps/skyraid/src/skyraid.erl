@@ -2,14 +2,11 @@
 -include("skyraid.hrl").
 
 -export([
-	start/0, stop/0, demo/0,
-	register/1, login/2, login/1, logout/1, 
-	user_info/1, 
-	file_open/3, file_close/1, file_write/2, file_write/4, file_read/1, file_read/3
+	start/0, stop/0,
+	register/1, authenticate/1, login/2, login/1, logout/1,
+	add_account/2, 
+	file_list/2, file_open/3, file_close/1, file_write/2, file_write/4, file_write/5, file_read/1, file_read/3, file_read/4
 ]).
-
--type session_ref() :: any().
--type file_ref() :: any().
 
 %% ===================================================================
 %% API Functions
@@ -28,38 +25,50 @@ stop() ->
 	application:stop(ssl),
 	application:stop(?MODULE).
 
-demo() ->
-	start_files_demo().
+-spec authenticate(atom() | skr_auth_reqtoken()) -> {ok, skr_auth_reqtoken()} | {ok, skr_auth_acctoken()} | {error | term()}.
+authenticate(Provider) when is_atom(Provider)->
+	skyraid_auth:authenticate(Provider);
 
--spec register(skr_user()) -> ok | {error, term()}.
+authenticate(#skr_auth_reqtoken{}=RT) ->
+	skyraid_auth:authenticate(RT).
+
+-spec register(skr_user() | skr_auth_reqtoken()) -> ok | {error, term()}.
 register(#skr_user{} = User) ->
 	skyraid_user_repo:new(User);
 
-register(AccountProvider) ->
-	case skyraid_auth:authenticate(AccountProvider) of
-		{ok, {access_token, Token}} ->
-			{ok, Account} = skyraid_storage:account_info(Token),
-			ok = skyraid_account_repo:new(Account),
-			{ok, Token};
-		Any -> Any
-	end.
+register(#skr_auth_reqtoken{}=RT) ->
+	{ok, #skr_auth_acctoken{}=AT} = skyraid_auth:authenticate(RT),
+	{ok, Account} = skyraid_storage:account_info(AT),
+	ok = skyraid_account_repo:new(Account).
 
-
--spec login(string(), string()) -> {ok, session_ref()} | {error, term()}.
+-spec login(binary(), binary()) -> {ok, session_ref()} | {error, term()}.
 login(Username, Password) ->
-	skyraid_auth:authenticate(Username, Password).
+	skyraid_auth:login(Username, Password).
 
--spec login(string()) -> {ok, session_ref()} | {error, term()}.	
-login(Token) ->
-	skyraid_auth:authenticate(Token).
+-spec login(skr_auth_reqtoken()) -> {ok, session_ref()} | {error, term()}.	
+login(#skr_auth_reqtoken{}=RT) ->
+	skyraid_auth:login(RT).
 
 -spec logout(session_ref()) -> ok | {error, term()}.
 logout(SessionRef) ->
 	skyraid_auth:logout(SessionRef).
 
--spec user_info(session_ref()) -> {ok, skr_user()} | {error, term()}.
-user_info(SessionRef) ->
-	skyraid_user:info(SessionRef).
+-spec add_account(session_ref(), skr_auth_reqtoken()) -> {ok, skr_session_info()} | {error, term()}.
+add_account(SessionRef, #skr_auth_reqtoken{}=RT) ->
+	{ok, AT} = skyraid_auth:authenticate(RT),
+	{ok, RemoteAccount} = skyraid_storage:account_info(AT),
+	{ok, #skr_session_info{user=#skr_user{id=UserID}}} = skyraid_user_session:info(SessionRef),
+	{ok, LocalAccount} = skyraid_account_repo:new(RemoteAccount#skr_account{user_id=UserID}),
+	skyraid_user_session:add_account(SessionRef, LocalAccount);
+
+add_account(SessionRef, #skr_account{}=A) ->
+	{ok, #skr_session_info{user=#skr_user{id=UserID}}} = skyraid_user_session:info(SessionRef),
+	{ok, LocalAccount} = skyraid_account_repo:new(A#skr_account{user_id=UserID}),
+	skyraid_user_session:add_account(SessionRef, LocalAccount).
+	
+file_list(SessionRef, Storage) ->
+	{ok, T} = skyraid_user_session:get_authentication(SessionRef, Storage),
+	skyraid_storage:file_list(T).
 
 -spec file_open(session_ref(), string(), list()) -> {ok, file_ref()}.
 file_open(SessionRef, FileName, Opts) ->
@@ -77,13 +86,23 @@ file_write(FileRef, Content) ->
 file_write(SessionRef, FileName, Content, Opts) ->
 	skyraid_file:write_file(SessionRef, FileName, Content, Opts).
 
+-spec file_write(session_ref(), atom(), string(), binary(), list()) -> ok | {error, term()}.
+file_write(SessionRef, Storage, FileName, Content, _Opts) ->
+	{ok, T} = skyraid_user_session:get_authentication(SessionRef, Storage),
+	skyraid_storage:write_file(T, FileName, Content).
+
 -spec file_read(file_ref()) -> {ok, binary()} | {error, term()}.
 file_read(FileRef) ->
 	skyraid_file:read(FileRef).
 
--spec file_read(session_ref(), string(), list()) -> ok | {error, term()}.
+-spec file_read(session_ref(), string(), list()) -> {ok, binary()} | {error, term()}.
 file_read(SessionRef, FileName, Opts) ->
 	skyraid_file:read_file(SessionRef, FileName, Opts).
+
+-spec file_read(session_ref(), atom(), string(), list()) -> {ok, binary()} | {error, term()}.
+file_read(SessionRef, Storage, FileName, _Opts) ->
+	{ok, T} = skyraid_user_session:get_authentication(SessionRef, Storage),
+	skyraid_storage:read_file(T, FileName).
 
 %% ====================================================================
 %% Internal functions
@@ -93,38 +112,3 @@ ensure_started(App) ->
         ok ->ok;
         {error, {already_started, App}} ->ok
     end.
-
-start_account_demo() ->
-	{ok, {{url, URL}, RT}} = skyraid:register(dropbox),
-	launch_user_authentication(URL),
-	{ok, AT} = skyraid:register(RT),
-	ok = skyraid_storage:account_info(AT).
-
-start_files_demo() ->
-	{ok, {{url, URL}, RT}} = skyraid:register(dropbox),
-	launch_user_authentication(URL),
-	{ok, AT} = skyraid:register(RT),
-	ok = skyraid_storage:file_list(AT).
-
-launch_user_authentication(URL) ->
-	process_flag(trap_exit, true),
-	Cmd = case os:type() of 
-			{win, _Osname} -> "start ";
-			{unix, _Osname} -> "epiphany "
-		end,
-
-	try open_port({spawn, Cmd ++ URL},[binary,{line, 255}]) of
-		Port -> await_user(Port)
-	catch
-		_ -> erlang:display("Exception catched")
-	end.
-
-await_user(Port) ->
-	receive 
-		{Port, Any} -> 
-			erlang:display(Any),
-			await_user(Port);
-		Any -> erlang:display(Any)
-	end. 
-
-
