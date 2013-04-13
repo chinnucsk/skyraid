@@ -66,7 +66,8 @@
 {
 	url :: string(),
 	provider :: atom(),
-	token :: term()
+	token :: term(),
+	verifier :: term()
 }).
 -type skr_auth_reqtoken() :: #skr_auth_reqtoken{}.
 

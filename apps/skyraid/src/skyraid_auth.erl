@@ -9,6 +9,7 @@ authenticate(Provider) when is_atom(Provider) ->
 	case Provider of
 		dropbox -> skyraid_storage_dropbox:authorize_url();
 		google -> skyraid_storage_google:authorize_url();
+		twitter -> skyraid_storage_twitter:authorize_url();
 		_ -> invalid_storage
 	end;
 
@@ -16,6 +17,7 @@ authenticate(#skr_auth_reqtoken{provider=Provider}=RT) ->
 	case Provider of
 		dropbox -> skyraid_storage_dropbox:access_token(RT);
 		google -> skyraid_storage_google:access_token(RT);
+		twitter -> skyraid_storage_twitter:access_token(RT);
 		_ -> invalid_storage
 	end.
 

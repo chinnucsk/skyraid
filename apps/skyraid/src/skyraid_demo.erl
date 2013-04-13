@@ -20,7 +20,8 @@ run() ->
 run(Provider, Demo) ->
 	{ok, #skr_auth_reqtoken{url=URL} = RT} = skyraid:authenticate(Provider),
 	launch_user_authentication(URL),
-	{ok, AT} = skyraid:authenticate(RT),
+	RTP = ask_for_pincode(RT),
+	{ok, AT} = skyraid:authenticate(RTP),
 	case Demo of
 		account -> account(AT);
 		files -> files(AT);
@@ -61,3 +62,7 @@ await_user(Port) ->
 		{'EXIT', Port, _} -> ok;
 		_ -> await_user(Port)
 	end. 
+
+ask_for_pincode(#skr_auth_reqtoken{}=RT) ->
+	PinCode = string:strip(io:get_line("Enter pin code:"), both, $\n),
+	RT#skr_auth_reqtoken{verifier=PinCode}.

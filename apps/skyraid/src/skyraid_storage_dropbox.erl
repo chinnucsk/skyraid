@@ -6,7 +6,7 @@
 -include_lib("eunit/include/eunit.hrl").
 -endif.
 
--define(key, "99s6c0nh6oeez3m").
+-define(key, "6b8S6hN6SK2YvYySTfpVg").
 -define(secret, "obv1gjb2aoq1zg6").
 -define(auth_url, "https://www.dropbox.com/1/oauth/authorize?oauth_token=").
 
