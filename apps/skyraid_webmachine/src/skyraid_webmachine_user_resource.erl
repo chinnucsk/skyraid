@@ -1,6 +1,6 @@
 -module(skyraid_webmachine_user_resource).
 
--include("../../skyraid/include/skyraid.hrl").
+-include_lib("skyraid/include/skyraid.hrl").
 -include_lib("jsonerl/src/jsonerl.hrl").
 
 -define(list_to_json(RecordName, List), "[" ++ string:join( [ [?record_to_json(RecordName, Rec)] || Rec <- List], ",\n") ++ "]").

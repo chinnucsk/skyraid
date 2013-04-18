@@ -35,7 +35,8 @@ upgrade() ->
 %% @spec init([]) -> SupervisorTree
 %% @doc supervisor callback.
 init([]) ->
-    Ip = case os:getenv("WEBMACHINE_IP") of false -> "0.0.0.0"; Any -> Any end,
+    {ok, Ip} = application:get_env(skyraid_webmachine, ip),
+    {ok, Port} = application:get_env(skyraid_webmachine, port),
 	
     {ok, FileDispatch} = file:consult(filename:join(
                          [filename:dirname(code:which(?MODULE)),
@@ -46,10 +47,12 @@ init([]) ->
 	Dispatch =  FileDispatch ++ [{['*'], skyraid_webmachine_root_resource, [DocRoot]}],
 
   WebConfig = [{ip, Ip},
-               {port, 8000},
+               {port, Port},
                {log_dir, "priv/log"},
                {dispatch, Dispatch}],
                
+  lager:info("Starting skyraid_webmachine with the following WebConfig: ~s :~s ", [Ip, Port]),
+
   Web = {webmachine_mochiweb, {webmachine_mochiweb, start, [WebConfig]}, permanent, 5000, worker, dynamic},
   Processes = [Web],
   {ok, { {one_for_one, 10, 10}, Processes} }.

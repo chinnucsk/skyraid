@@ -12,7 +12,8 @@ skyraid_webmachine_test_() ->
 	}.
 
 setup() ->
-	ok =skyraid:start(),
+	application:set_env(skyraid_webmachine, ip, "127.0.0.1"),
+	application:set_env(skyraid_webmachine, port, 8000),
 	ok = skyraid_webmachine:start().
 
 teardown(_Any) ->

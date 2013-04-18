@@ -1,6 +1,9 @@
 -type session_ref() :: any().
 -type file_ref() :: any().
 
+
+-define(INFO(Msg), lager:info(Msg)).
+
 -record(skr_user, 
 {
 	id = erlang:ref_to_list(make_ref()) :: reference(),

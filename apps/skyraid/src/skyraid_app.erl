@@ -1,5 +1,7 @@
 -module(skyraid_app).
 
+-include("skyraid.hrl").
+
 -behaviour(application).
 
 %% Application callbacks
@@ -10,6 +12,7 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
+	?INFO("Starting skyraid"),
     skyraid_sup:start_link().
 
 stop(_State) ->
