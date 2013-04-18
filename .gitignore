@@ -1,3 +1,7 @@
 deps/
 apps/*/.eunit
 apps/*/ebin
+*.iml
+rel/skyraid/
+.idea/
+*.patch
