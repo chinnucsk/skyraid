@@ -1,0 +1,22 @@
+<div>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Type</th>
+				<th>Size</th>
+			</tr>
+		</thead>
+		<tbody>
+			
+			<!-- ko foreach: storage.files -->
+            <tr>
+                <td data-bind="text: name"/>
+                <td data-bind="text: type"/>
+                <td data-bind="text: size"/>
+            </tr>
+			<!-- /ko -->
+
+		</tbody>
+	</table>
+</div>
