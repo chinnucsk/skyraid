@@ -3,11 +3,13 @@
  	<a href="#home">Home</a>
  	<ul class="nav nav-tabs">
     	<li class="active">
-    		<a href="#">Login</a>
+    		<a data-bind="click: showLogin">Login</a>
     	</li>
-    	<li><a href="#">Register</a></li>
+    	<li>
+    		<a data-bind="click: showRegister">Register</a>
+    	</li>
     </ul>
     <div>
-        <!--ko compose: '../skyraid/main/login.html'--><!--/ko-->
+    	<div data-bind="compose: activeView"></div>
     </div>
 </div>

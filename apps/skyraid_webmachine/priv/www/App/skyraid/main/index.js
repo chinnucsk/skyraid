@@ -1,7 +1,17 @@
-define(['durandal/viewModel'], function (viewModel) {
+define(['./login', './register', 'durandal/app', 'durandal/viewModel'], function (Login, Register, app, viewModel) {
+
+	var login = Login;
+	var register = Register;
 
    	return {
-        showLogin : ko.observable(true),
-        showRegister : ko.observable(false)
+        activeView: login,
+
+        showLogin: function() {
+        	this.activeView = login
+        },
+
+        showRegister: function() {
+        	this.activeView = register
+        }
     } 
 });
