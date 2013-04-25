@@ -21,4 +21,4 @@ teardown(_Any) ->
 	ok = skyraid_webmachine:stop().
 
 get_all_users() ->
-	{ok, {{_Version, 200, _ReasonPhrase}, _Headers, body}} = httpc:request("http://localhost:8000/api/user").
+	{ok, {{_Version, 200, _ReasonPhrase}, _Headers, _body}} = httpc:request("http://localhost:8000/api/user").

@@ -5,3 +5,5 @@ apps/*/ebin
 rel/skyraid/
 .idea/
 *.patch
+log/
+rel/vars/dev*vars.config

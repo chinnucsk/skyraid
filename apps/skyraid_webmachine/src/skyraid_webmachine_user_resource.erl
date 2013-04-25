@@ -1,9 +1,10 @@
 -module(skyraid_webmachine_user_resource).
 
 -include_lib("skyraid/include/skyraid.hrl").
--include_lib("jsonerl/src/jsonerl.hrl").
 
--define(list_to_json(RecordName, List), "[" ++ string:join( [ [?record_to_json(RecordName, Rec)] || Rec <- List], ",\n") ++ "]").
+-ifdef(TEST).
+-include_lib("eunit/include/eunit.hrl").
+-endif.
 
 -export([init/1, content_types_provided/2, resource_exists/2, to_json/2]).
 
@@ -12,7 +13,6 @@
 init([]) -> {ok, []}.
 
 content_types_provided(ReqData, Context) ->
-	erlang:display("user resource"),
 	{[{"application/json", to_json}], ReqData, Context}.
 
 resource_exists(ReqData, Context) ->
@@ -31,8 +31,28 @@ to_json(_ReqData, []) ->
 	{"", _ReqData, []};
 
 to_json(ReqData, [User]) ->
-	{ ?record_to_json(skr_user, User), ReqData, User};
+	{ mochijson2:encode(user_to_proplist(User)), ReqData, User};
 
 to_json(ReqData, Users) when is_list(Users)->
-	{ ?list_to_json(skr_user, Users), ReqData, Users}.
+	UP = [user_to_proplist(U) || U <- Users],
+	Json = mochijson2:encode(UP),
+	{ Json, ReqData, Users}.
 
+user_to_proplist(#skr_user{id=Id, username=Username, display_name=DisplayName}) ->
+	[{id, Id}, {username, Username}, {display_name, DisplayName}].
+
+%% ====================================================================
+%% Unit Tests 
+%% ====================================================================
+-ifdef(TEST).
+
+to_json_test() ->
+	User = #skr_user{username = <<"Apa">>, 
+			  password = <<"test">>, 
+			  display_name = <<"ApaDisplay">>, 
+			  email = <<"adam@gmail.com">>},
+	
+ 	{Json, _, _} = to_json([], [User]),
+ 	{struct, [{<<"id">>, _}, {<<"username">>, <<"Apa">>}, {<<"display_name">>, <<"ApaDisplay">>}]} = mochijson2:decode(Json).
+
+ -endif.

@@ -7,16 +7,14 @@
 
 -define(T(TestName), {atom_to_list(TestName), fun TestName/0}).
 
-skyraid_test_() ->
+all_test_() ->
 	{setup, fun setup/0, fun teardown/1,
 		[
 			?T(register_normal),
 			?T(login_normal),
-			%%?T(login_dropbox),
 			?T(login_invalid_password),
 			?T(login_invalid_username_password),
 			?T(logout_normal),
-			?T(add_account),
 			?T(write_chunked_normal),
 			?T(write_file_normal),
 			?T(read_file_normal)
@@ -34,16 +32,12 @@ register_normal() ->
 				  password = <<"test">>, 
 				  display_name = <<"ApaDisplay">>, 
 				  email = <<"adam@gmail.com">>},
-	?assertEqual(ok, skyraid:register(User)).
+	?assertEqual({ok, User}, skyraid:register(User)).
 
 login_normal() ->
 	{ok, Session} = skyraid:login(<<"Adam">>, <<"test">>),
 	{ok, I} = skyraid_user_session:info(Session),
 	?assertEqual(I#skr_session_info.user#skr_user.username, <<"Adam">>).
-
-login_dropbox() ->
-	{ok, #skr_auth_reqtoken{token=Token}} = skyraid:login(dropbox),
-	{ok, _} = skyraid:login(Token).
 
 
 login_invalid_password() ->
@@ -58,10 +52,10 @@ logout_normal() ->
 	ok = skyraid:logout(Session),
 	?assertException(exit, _, skyraid_user_session:info(Session)).
 
-add_account() ->
-	{ok, Session} = skyraid:login(<<"Adam">>, <<"test">>),
-	{ok, #skr_auth_reqtoken{token=Token}} = skyraid:authenticate(dropbox),
-	{ok, Session} = skyraid:add_account(Session, Token).
+%%add_account() ->
+%%	{ok, Session} = skyraid:login(<<"Adam">>, <<"test">>),
+%%	{ok, #skr_auth_reqtoken{token=Token}} = skyraid:authenticate(dropbox),
+%%	{ok, Session} = skyraid:add_account(Session, Token).
 
 write_chunked_normal() ->
 	{ok, Session} = skyraid:login(<<"Adam">>, <<"test">>),

@@ -27,12 +27,12 @@ access_token(#skr_auth_reqtoken{provider=dropbox, token=[{"oauth_token_secret", 
 
 account_info(#skr_auth_acctoken{provider=dropbox, token=[{"oauth_token_secret", TokenSecret}, {"oauth_token", Token}, {"uid", _Uid}]}=AT) ->
 	Response = account_info(?key, ?secret, Token, TokenSecret),
-	Resp = jiffy:decode(Response),
+	Resp = mochijson2:decode(Response),
 	{ok, to_account(Resp, AT)}.
 
 list_files(#skr_auth_acctoken{provider=dropbox, token=[{"oauth_token_secret", TokenSecret}, {"oauth_token", Token}, {"uid", _Uid}]}) ->
 	Response = metadata(?key, ?secret, Token, TokenSecret, "dropbox", ""),
-	Resp = jiffy:decode(Response),
+	Resp = mochijson2:decode(Response),
 	{ok, to_files(Resp)}.
 
 write_file(#skr_auth_acctoken{provider=dropbox, token=[{"oauth_token_secret", TokenSecret}, {"oauth_token", Token}, {"uid", _Uid}]}, FileName, Content) ->
@@ -115,6 +115,6 @@ to_account_test() ->
 	    		{<<"normal">>,1425347}]}},
 	    		{<<"email">>,<<"apa.nilsson@gmail.com">>}]},
 	
- 	#skr_account{display_name = <<"Apa Nilsson">>} = to_account(A).
+ 	#skr_account{display_name = <<"Apa Nilsson">>} = to_account(A, #skr_account{storage_id=dropbox}).
 
  -endif.

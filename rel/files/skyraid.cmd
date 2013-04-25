@@ -14,8 +14,19 @@
     @call :set_trim release_version %%J
 )
 
+@rem set app config path
+@if exist %releases_dir%\%release_version%\sys.config (
+    @set app_config=%releases_dir%\%release_version%\sys.config
+) else (
+    @set app_config=%node_root%\etc\app.config
+)
+
 @rem extract erlang cookie from vm.args
-@set vm_args=%releases_dir%\%release_version%\vm.args
+@if exist %releases_dir%\%release_version%\vm.args (
+    @set vm_args=%releases_dir%\%release_version%\vm.args
+) else (
+    @set vm_args=%node_root%\etc\vm.args
+)
 @for /f "usebackq tokens=1-2" %%I in (`findstr /b \-setcookie %vm_args%`) do @set erlang_cookie=%%J
 
 @set erts_bin=%node_root%\erts-%erts_version%\bin
@@ -56,7 +67,7 @@
 @goto :EOF
 
 :console
-@start %erts_bin%\werl.exe -boot %releases_dir%\%release_version%\%node_name% -config %releases_dir%\%release_version%\sys.config -args_file %vm_args% -sname %node_name%
+@start %erts_bin%\werl.exe -boot %releases_dir%\%release_version%\%node_name% -config %app_config% -args_file %vm_args% -sname %node_name%
 @goto :EOF
 
 :query
