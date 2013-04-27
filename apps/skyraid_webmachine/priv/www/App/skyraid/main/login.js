@@ -1,11 +1,13 @@
-define(['durandal/app'], function (app) {
+define(['skyraid/backend', 'durandal/app', 'durandal/plugins/router'], function (backend, app, router) {
 	
    	return {
-        username: 'Adam',
-        password: 'test',
+        username: ko.observable(),
+        password: ko.observable(),
 
         login: function () {
-            app.showMessage('Hello !', 'Greetings');
+        	backend.login(this.username(), this.password()).then(function(result) {
+            	router.navigateTo('#home');
+        	})
         }
     } 
 });

@@ -1,4 +1,4 @@
-define(function(require) {
+define(['durandal/system'], function (system) {
     return {
         authenticate:function(Provider) {
             //do some ajax and return a promise
@@ -9,7 +9,11 @@ define(function(require) {
         },
 
         register:function(Username, Password, Email) {
-            //do some ajax and return a promise
+            var result = {status: 'ok', message: 'Registration complete'};
+
+            var dfr = $.Deferred();
+            dfr.resolve(result);
+            return dfr;
         },         
 
         login:function(Token) {
@@ -17,7 +21,22 @@ define(function(require) {
         },
 
         login:function(Username, Password) {
-            //do some ajax and return a promise
+            var result = {
+                status: 'ok', 
+                sessionId: 'YourSessionId',
+                user: {
+                    displayName: 'Adam',
+                    email: 'my@gmail.com',
+                    accounts: [
+                        {id: "12", name: "Drop12", provider: "dropbox"},    
+                        {id: "33", name: "Drop33", provider: "dropbox"}    
+                    ]
+                }
+            };
+
+            var dfr = $.Deferred();
+            dfr.resolve(result);
+            return dfr;
         },
 
         logout:function() {

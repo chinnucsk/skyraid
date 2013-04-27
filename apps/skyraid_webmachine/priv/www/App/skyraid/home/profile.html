@@ -15,18 +15,18 @@
             <ul class="nav nav-list">
             	<li class="nav-header">Account Details </li>
             	<li>
-            		<a data-bind="text: accountDetails.name"></a>
-            		<a data-bind="text: accountDetails.provider"></a>
+            		<a data-bind="text: activeAccount.name"></a>
+            		<a data-bind="text: activeAccount.provider"></a>
             	</li>
             	<li class="nav-header">Quota</li>
             	<li>
-            		<a data-bind="text: accountDetails.quotaUsed"></a>
+            		<a data-bind="text: activeAccount.quotaUsed"></a>
             		<div class="progress progress-info">
             			<div class="bar" style="width: 20%"></div>
             		</div>
             	</li>
             	<li>
-            		<a data-bind="text: accountDetails.quotaTotal"></a>
+            		<a data-bind="text: activeAccount.quotaTotal"></a>
             		<div class="progress progress-info">
             			<div class="bar" style="width: 100%"></div>
             		</div>

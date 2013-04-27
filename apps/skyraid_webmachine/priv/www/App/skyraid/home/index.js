@@ -1,19 +1,9 @@
-define(function () {
+define(['skyraid/home/user'], function (user) {
 
    	return {
-
-        accounts: [{
-            name: 'DropBox1'
-        },{
-            name: 'FTP1'
-        }],
-
-        accountDetails: {
-            name: 'DropBox1',
-            provider: "dropbox",
-            quotaTotal: 200,
-            quotaUsed: 100  
-        },
+        displayName: user.displayName,
+        accounts: user.accounts,
+        activeAccount: user.accounts()[0],  
 
         storage: {
             name: 'DropBox1',

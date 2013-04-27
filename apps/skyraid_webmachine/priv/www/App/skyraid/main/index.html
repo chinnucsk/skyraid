@@ -2,11 +2,11 @@
  	Welcome to Skyraid
  	<a href="#home">Home</a>
  	<ul class="nav nav-tabs">
-    	<li class="active">
-    		<a data-bind="click: showLogin">Login</a>
+    	<li data-bind="css: { active: loginTabActive() }">
+             <a href="#main/login">Login</a>
     	</li>
-    	<li>
-    		<a data-bind="click: showRegister">Register</a>
+    	<li data-bind="css: { active: registerTabActive() }">
+    		<a href="#main/register">Register</a>
     	</li>
     </ul>
     <div>
