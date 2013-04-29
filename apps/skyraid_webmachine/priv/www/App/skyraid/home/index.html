@@ -14,10 +14,12 @@
 
     <div class="container-fluid home">
         <div class="row-fluid">
-            <!--ko compose: '../skyraid/home/profile.html'--><!--/ko-->
-            <div class="span10">
-                <br/>
-                <!--ko compose: '../skyraid/home/storage.html'--><!--/ko-->
+            <div class="span2" data-bind="compose: {view: '../skyraid/home/profile'}">
+            </div>
+            <div class="span10" data-bind="compose: {
+                    model: '../skyraid/home/storage',
+                    view: '../skyraid/home/storage',
+                    activate: true}">
             </div>
         </div>
     </div>

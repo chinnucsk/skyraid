@@ -41,6 +41,24 @@ define(['durandal/system'], function (system) {
 
         logout:function() {
             //do some ajax and return a promise
+        },
+
+        getStorage: function(SessionId, name) {
+            var result = {
+                status: 'ok',
+                storage: {
+                    name: 'DropBox1',
+                    provider: 'dropbox',
+                    files: [
+                        { name: 'myfile.png', type: "png", size: 1220},
+                        { name: 'myfile.txt', type: "txt", size: 10}
+                    ]
+                }
+            };
+
+            var dfr = $.Deferred();
+            dfr.resolve(result);
+            return dfr;
         }
     };
 });

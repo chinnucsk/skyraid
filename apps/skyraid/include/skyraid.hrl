@@ -1,7 +1,7 @@
 -type session_ref() :: any().
 -type file_ref() :: any().
 
-
+-define(DEBUG(Msg), erlang:display(Msg)).
 -define(INFO(Msg), lager:info(Msg)).
 
 -record(skr_user, 
