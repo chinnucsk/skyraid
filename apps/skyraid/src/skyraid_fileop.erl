@@ -52,7 +52,3 @@ terminate(_Reason, _StateName, _StatData) ->
 
 code_change(_OldVsn, StateName, StateData, _Extra) ->
     {ok, StateName, StateData}.
-
-%% ====================================================================
-%% Internal functions
-%% ====================================================================

@@ -9,14 +9,6 @@ define(['durandal/system'], function (system) {
         },
 
         register:function(Username, Password, Email) {
-            $.ajax({ 
-                type: "GET",
-                dataType: "json",
-                url: "http://localhost:8080/restws/json/product/get",
-                success: function(data){        
-                    alert(data);
-                }
-            });
             var result = {status: 'ok', message: 'Registration complete'};
 
             var dfr = $.Deferred();

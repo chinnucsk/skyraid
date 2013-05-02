@@ -2,13 +2,16 @@
 
 -include("skyraid.hrl").
 
--export([new/1, all/0, get/1]).
+-export([new/1, get_all_accounts/0, get_account/2, get_accounts/1]).
 
 new(#skr_account{}=Account) ->
 	skyraid_db:create_account(Account).
 
-all() ->
-	skyraid_db:get_accounts().	
+get_all_accounts() ->
+	skyraid_db:get_all_accounts().	
 
-get(AccountId) ->
-	skyraid_db:get_account(AccountId).
+get_accounts(UserId) ->
+	skyraid_db:get_accounts(UserId).
+
+get_account(UserId, AccountId) ->
+	skyraid_db:get_account(UserId, AccountId).

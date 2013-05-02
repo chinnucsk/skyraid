@@ -45,7 +45,9 @@ create_user(#skr_user{} = User) ->
 	end.
 
 get_accounts() ->
-	ets:tab2list(skr_account).
+	case ets:tab2list(skr_account) of
+		Accounts -> {ok, Accounts}
+	end.
 
 get_account(AccountID) ->
 	case read(skr_account, AccountID) of
