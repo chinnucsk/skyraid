@@ -11,7 +11,6 @@ define(['skyraid/backend', 'skyraid/home/user', 'durandal/system'], function (ba
 
         activate: function() {
 			backend.getStorage(this.sessionId, "todo provide name").then(function(result) {
-                system.log("hello", this);
 				Name(result.storage.name);
 				Provider(result.storage.provider);
 				Files.push.apply(Files, result.storage.files);
