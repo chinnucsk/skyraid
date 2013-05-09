@@ -43,7 +43,7 @@ login_invalid_username_password() ->
 	[{<<"status">>,<<"error">>},{<<"error">>,<<"invalid_username_password">>}] = rest_req(post, "http://localhost:8000/api/login", Login).
 
 create_user_normal() ->
-	User = "{\"username\":\"NewUser\", \"password\": \"test\", \"email\": \"my.mail@gmail.com\" }",
+	User = <<"{username:NewUser, password: test, email: my.mail@gmail.com}">>,
 	[{<<"status">>,<<"ok">>}, {<<"userId">>, _UserId }] = rest_req(put, "http://localhost:8000/api/user", User).
 
 create_user_existing_username() ->

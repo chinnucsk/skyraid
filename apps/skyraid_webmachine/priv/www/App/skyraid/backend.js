@@ -9,20 +9,19 @@ define(['durandal/system'], function (system) {
         },
 
         register:function(Username, Password, Email) {
-            $.ajax({ 
-                type: "GET",
-                dataType: "json",
-                url: "http://localhost:8080/restws/json/product/get",
-                success: function(data){        
-                    alert(data);
-                }
-            });
-            var result = {status: 'ok', message: 'Registration complete'};
+            var register = {username: Username, password: "test", email: "mymail"};
 
-            var dfr = $.Deferred();
-            dfr.resolve(result);
-            return dfr;
-        },         
+            var promise = $.ajax({
+                type: "PUT",
+                contentType:"application/json; charset=utf-8",
+                dataType: "json",
+                url: "http://localhost:80/api/user",
+                data: JSON.stringify(register),
+                processData: false
+            });
+
+            return promise;
+        },          
 
         login:function(Token) {
             //do some ajax and return a promise
@@ -67,6 +66,12 @@ define(['durandal/system'], function (system) {
             var dfr = $.Deferred();
             dfr.resolve(result);
             return dfr;
+        },
+
+        getLocale: function(Locale) {
+            return {
+                username_exist: "Username already exist"
+            }
         }
     };
 });

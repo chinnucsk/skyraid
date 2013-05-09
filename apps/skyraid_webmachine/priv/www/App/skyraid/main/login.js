@@ -1,10 +1,15 @@
 define(['skyraid/backend', 'skyraid/home/user', 'durandal/app', 'durandal/plugins/router'], function (backend, user, app, router) {
-	
+
+	var Username = ko.observable();
+    var Password = ko.observable();
+
    	return {
-        username: ko.observable(),
-        password: ko.observable(),
+        username: Username,
+        password: Password,
 
         login: function () {
+            app.showMessage(this.username());
+            
         	backend.login(this.username(), this.password()).then(function(result) {
                 user.displayName(result.user.displayName);
                 user.email(result.user.email);

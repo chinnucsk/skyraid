@@ -4,6 +4,7 @@
 @set verbose=NO
 @set quiet=NO
 
+
  
 @set release_lib=rel\skyraid\lib\
 @set release_erts_bin=%CD%\rel\skyraid\erts-*\bin

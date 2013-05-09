@@ -49,6 +49,7 @@ to_json(ReqData, Users) when is_list(Users) ->
 	{ Json, ReqData, Users}.
 
 from_json(ReqData, Context) ->
+	?DEBUG("Register user"), 
 	{struct, UserPropList} = mochijson2:decode(wrq:req_body(ReqData)),
 	User = proplist_to_user(UserPropList),
 	Response = case skyraid_user_repo:new(User) of
@@ -75,7 +76,7 @@ proplist_to_user([{<<"username">>, Username}, {<<"password">>, Password}, {<<"em
 -ifdef(TEST).
 
 to_json_test() ->
-	User = #skr_user{username = <<"Apa">>, 
+	User = #skr_user{username = <<"Apa">>,
 			  password = <<"test">>, 
 			  display_name = <<"ApaDisplay">>, 
 			  email = <<"adam@gmail.com">>},
