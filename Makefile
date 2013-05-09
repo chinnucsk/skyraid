@@ -23,9 +23,8 @@ rel: all
 relclean:
 	rm -rf rel/skyraid
 
-stage : rel
-	$(foreach dep,$(wildcard deps/*), rm -rf rel/skyraid/lib/$(shell basename $(dep))-* && ln -sf $(abspath $(dep)) rel/skyraid/lib;)
-	$(foreach app,$(wildcard apps/*), rm -rf rel/skyraid/lib/$(shell basename $(app))-* && ln -sf $(abspath $(app)) rel/skyraid/lib;)
+stage:
+	$(foreach app,$(wildcard apps/*), rm -rf rel/skyraid/lib/$(shell basename $(app))-* && ln -sT $(abspath $(app)) rel/skyraid/lib/$(shell basename $(app))-1;)
 
 
 ##
