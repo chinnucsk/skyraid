@@ -46,18 +46,17 @@ to_json(ReqData, [User]) ->
 to_json(ReqData, Users) when is_list(Users) ->
 	UP = [user_to_proplist(U) || U <- Users],
 	Json = mochijson2:encode(UP),
-	{ Json, ReqData, Users}.
+	{Json, ReqData, Users}.
 
 from_json(ReqData, Context) ->
-	?DEBUG("Register user"), 
 	{struct, UserPropList} = mochijson2:decode(wrq:req_body(ReqData)),
 	User = proplist_to_user(UserPropList),
-	Response = case skyraid_user_repo:new(User) of
-		{ok, #skr_user{id=ID}} -> [{status, ok}, {userId, ID}];
-		{error, Error} -> [{status, error}, {error, Error}]
-	end,
+	{Result, Response} = case skyraid_user_repo:new(User) of
+							{ok, #skr_user{id=ID}} -> {true, [{status, ok}, {userId, ID}]};
+							{error, Error} -> {{halt, 500}, [{status, error}, {error, Error}]}
+						 end,
 	Json = mochijson2:encode(Response),
-	{true, wrq:append_to_response_body(Json, ReqData), Context}.
+	{Result, wrq:append_to_response_body(Json, ReqData), Context}.
 
 %% ====================================================================
 %% Private
@@ -83,5 +82,9 @@ to_json_test() ->
 	
  	{Json, _, _} = to_json([], [User]),
  	{struct, [{<<"id">>, _}, {<<"username">>, <<"Apa">>}, {<<"displayName">>, <<"ApaDisplay">>}]} = mochijson2:decode(Json).
+
+ from_json_test() ->
+ 	Json = <<"{\"username\":\"NewUser\", \"password\": \"test\", \"email\": \"my.mail@gmail.com\"}">>,
+ 	{struct, _ } = mochijson2:decode(Json).
 
  -endif.

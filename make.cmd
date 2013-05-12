@@ -56,8 +56,8 @@
 :stage
 @rmdir /S %release_lib%skyraid-1
 @rmdir /S %release_lib%skyraid_webmachine-1
-@mklink %release_lib%skyraid-1 %skyraid_src%
-@mklink %release_lib%skyraid_webmachine-1 %skyraid_webmachine_src%
+@mklink /D %release_lib%skyraid-1 %skyraid_src%
+@mklink /D %release_lib%skyraid_webmachine-1 %skyraid_webmachine_src%
 @goto :EOF
 
  

@@ -34,7 +34,6 @@ resource_exists(ReqData, Context) ->
 		[UserId] ->
 			case skyraid_account_repo:get_accounts(UserId) of
 				{ok, Accounts} -> 
-					?DEBUG(Accounts),
 					{true, ReqData, Accounts};
 				not_found -> {false, ReqData, Context}
 			end;

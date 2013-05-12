@@ -24,11 +24,12 @@ allow_missing_post(ReqData, Context) ->
 process_post(ReqData, Context) ->
 	Body = wrq:req_body(ReqData),
 	{struct, [{<<"username">>, Username}, {<<"password">>, Password}]} = mochijson2:decode(Body),
-	Response = case skyraid:login(Username, Password) of
-						{ok, SessionRef} ->
-							{ok, _SessionInfo} = skyraid_user_session:info(SessionRef),
-							[{status, ok}, {session, pid_to_list(SessionRef)}, {user, "Adam"}];
-						{error, Error} -> [{status, error}, {error, Error}]
-				end,
+	{Result, Response} = case skyraid:login(Username, Password) of
+							{ok, SessionRef} ->
+								{ok, _SessionInfo} = skyraid_user_session:info(SessionRef),
+								{true, [{status, ok}, {session, pid_to_list(SessionRef)}, {user, "Adam"}]};
+							{error, Error} -> 
+								{{halt, 500}, [{status, error}, {error, Error}]}
+						end,
 	Json = mochijson2:encode(Response),
-	{true, wrq:append_to_response_body(Json, ReqData), Context}.
+	{Result, wrq:append_to_response_body(Json, ReqData), Context}.
