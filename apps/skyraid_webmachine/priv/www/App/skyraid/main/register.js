@@ -18,6 +18,9 @@ define(['skyraid/backend','skyraid/home/user', 'durandal/app', 'durandal/plugins
                 } else {
                     Alerts.push({message: result.error, priority: 'error'});
                 }
+            }, function(jqxhr) {
+                var response = $.parseJSON(jqxhr.responseText);
+                Alerts.push({message: response.error, priority: 'error'});
             })
         };
 
