@@ -18,7 +18,8 @@
 -record(skr_session_info, 
 {
 	timestamp :: term(),
-	user :: skr_user()
+	user :: skr_user(),
+	accounts = [] :: [skr_account()]
 }).
 -type skr_session_info() :: #skr_session_info{}.
 

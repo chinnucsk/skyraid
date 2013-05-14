@@ -9,6 +9,7 @@ skyraid_webmachine_test_() ->
 	{setup, fun setup/0, fun teardown/1,
 		[
 			?T(login_normal),
+			?T(login_no_accounts),
 			?T(login_invalid_password),
 			?T(login_invalid_username_password),
 
@@ -32,7 +33,17 @@ teardown(_Any) ->
 
 login_normal() ->
 	Login = "{\"username\":\"Adam\", \"password\": \"test\"}",
-	{200, [{<<"status">>,<<"ok">>},{<<"session">>, _Session},{<<"user">>,"Adam"}]} = rest_req(post, "http://localhost:8000/api/login", Login).
+	{200,[{<<"status">>,<<"ok">>},
+		  {<<"sessionId">>,_},
+          {<<"user">>,{struct,[{<<"displayName">>,<<"AdamDisplay">>},{<<"email">>,<<"adam@gmail.com">>}]}},
+          {<<"accounts">>,[]}]} = rest_req(post, "http://localhost:8000/api/login", Login).
+
+login_no_accounts() ->
+	Login = "{\"username\":\"Eva\", \"password\": \"test\"}",
+	{200,[{<<"status">>,<<"ok">>},
+		  {<<"sessionId">>,_},
+          {<<"user">>,{struct,[{<<"displayName">>,<<"AdamDisplay">>},{<<"email">>,<<"adam@gmail.com">>}]}},
+          {<<"accounts">>,[]}]} = rest_req(post, "http://localhost:8000/api/login", Login).
 
 login_invalid_password() ->
 	Login = "{\"username\":\"Adam\", \"password\": \"WrongPassword\"}",

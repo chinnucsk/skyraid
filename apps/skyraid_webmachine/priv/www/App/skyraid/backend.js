@@ -4,7 +4,7 @@ define(['durandal/system'], function (system) {
             //do some ajax and return a promise
         },
 
-        register:function(Token) {
+        registerWithToken:function(Token) {
             //do some ajax and return a promise
         },
 
@@ -23,27 +23,23 @@ define(['durandal/system'], function (system) {
             return promise;
         },          
 
-        login:function(Token) {
+        loginWithToken:function(Token) {
             //do some ajax and return a promise
         },
 
         login:function(Username, Password) {
-            var result = {
-                status: 'ok', 
-                sessionId: 'YourSessionId',
-                user: {
-                    displayName: 'Adam',
-                    email: 'my@gmail.com',
-                    accounts: [
-                        {id: "12", name: "Drop12", provider: "dropbox"},    
-                        {id: "33", name: "Drop33", provider: "dropbox"}    
-                    ]
-                }
-            };
+            var login = {username: Username, password: Password};
 
-            var dfr = $.Deferred();
-            dfr.resolve(result);
-            return dfr;
+            var promise = $.ajax({
+                type: "POST",
+                contentType:"application/json; charset=utf-8",
+                dataType: "json",
+                url: "http://localhost:80/api/login",
+                data: JSON.stringify(login),
+                processData: false
+            });
+
+            return promise;
         },
 
         logout:function() {
@@ -71,7 +67,7 @@ define(['durandal/system'], function (system) {
         getLocale: function(Locale) {
             return {
                 username_exist: "Username already exist"
-            }
+            };
         }
     };
 });

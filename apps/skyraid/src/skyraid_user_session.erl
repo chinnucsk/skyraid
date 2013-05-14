@@ -30,23 +30,26 @@ get_authentication(SessionRef, Storage) ->
 -record(state, 
 {
     timestamp = erlang:now(),
-    user
+    user,
+    accounts
 }).
 
 %% ====================================================================
 %% Behavioural functions 
 %% ====================================================================
 
-init([User]) ->
-    {ok, #state{user=User}}.
+init([#skr_user{id=UserId}=User]) ->
+    {ok, Accounts} = skyraid_account_repo:get_accounts(UserId),
+    ?DEBUG({Accounts, UserId}),
+    {ok, #state{user=User, accounts=Accounts}}.
 
 handle_call(get_info, _From, S) ->
     Info = create_session_info(S),
 	{reply, {ok, Info}, S};
 
-handle_call({add_account, NewAccount}, _From, #state{user=#skr_user{accounts=CurrentAccounts}}=S) ->
+handle_call({add_account, NewAccount}, _From, #state{accounts=CurrentAccounts}=S) ->
     %% TODO add check for already existing or?
-    NewState = S#state{user=#skr_user{accounts=CurrentAccounts ++ [NewAccount]}},
+    NewState = S#state{accounts=CurrentAccounts ++ [NewAccount]},
     Info = create_session_info(NewState),
     {reply, {ok, Info}, NewState};
 
@@ -77,5 +80,5 @@ code_change(_OldVsn, State, _Extra) ->
 %% Internal functions
 %% ====================================================================
 
-create_session_info(#state{timestamp=TimeStamp, user=User}) ->
-    #skr_session_info{timestamp=TimeStamp, user=User}.
+create_session_info(#state{timestamp=TimeStamp, user=User, accounts=Accounts}) ->
+    #skr_session_info{timestamp=TimeStamp, user=User, accounts=Accounts}.

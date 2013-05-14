@@ -19,4 +19,9 @@
             <button type="submit" class="btn" data-bind="click: login">Sign in</button>
         </div>
     </div>
+    <!-- ko foreach: alerts -->
+        <div class="alert alert-error">
+            <strong data-bind="text: message"></strong>
+        </div>
+    <!-- /ko -->
 </form>

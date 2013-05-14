@@ -3,7 +3,7 @@ define(['./login', './register', 'durandal/app', 'durandal/viewModel', 'durandal
 	var login = Login;
 	var register = Register;
 
-   	return {
+    return {
         loginTabActive: ko.observable(),
         registerTabActive: ko.observable(),
 
@@ -21,5 +21,5 @@ define(['./login', './register', 'durandal/app', 'durandal/viewModel', 'durandal
                 this.activeView(login);
             }
         }
-    } 
+    }; 
 });

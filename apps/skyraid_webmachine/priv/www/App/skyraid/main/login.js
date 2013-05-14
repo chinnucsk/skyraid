@@ -3,19 +3,26 @@ define(['skyraid/backend', 'skyraid/home/user', 'durandal/app', 'durandal/plugin
 	var Username = ko.observable();
     var Password = ko.observable();
 
-   	return {
+    var Alerts = ko.observableArray([]);
+
+    Login = function () {
+        backend.login(Username(), Password()).then(function(result) {
+            user.displayName(result.user.displayName);
+            user.email(result.user.email);
+            user.accounts.push.apply(user.accounts, result.user.accounts);
+            router.navigateTo('#home');
+        }, function(jqxhr) {
+            var response = $.parseJSON(jqxhr.responseText);
+            Alerts.push({message: response.error, priority: 'error'});
+        });
+    };
+
+    return {
         username: Username,
         password: Password,
 
-        login: function () {
-            app.showMessage(this.username());
-            
-        	backend.login(this.username(), this.password()).then(function(result) {
-                user.displayName(result.user.displayName);
-                user.email(result.user.email);
-                user.accounts.push.apply(user.accounts, result.user.accounts);
-            	router.navigateTo('#home');
-        	})
-        }
-    } 
+        alerts: Alerts,
+
+        login: Login
+    }; 
 });
