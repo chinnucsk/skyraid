@@ -33,16 +33,16 @@ teardown(_Any) ->
 
 login_normal() ->
 	Login = "{\"username\":\"Adam\", \"password\": \"test\"}",
-	{200,[{<<"status">>,<<"ok">>},
-		  {<<"sessionId">>,_},
-          {<<"user">>,{struct,[{<<"displayName">>,<<"AdamDisplay">>},{<<"email">>,<<"adam@gmail.com">>}]}},
-          {<<"accounts">>,[]}]} = rest_req(post, "http://localhost:8000/api/login", Login).
+	{200,[	{<<"status">>,<<"ok">>},
+          	{<<"sessionId">>,<<"<0.204.0>">>},
+			{<<"user">>,{struct,[{<<"displayName">>,<<"AdamDisplay">>},{<<"email">>,<<"adam@gmail.com">>}]}},
+            {<<"accounts">>,{struct,[{<<"id">>,<<"0.0">>},{<<"name">>,<<"AdamAccount1">>},{<<"provider">>,<<"ftp">>}]}}]} = rest_req(post, "http://localhost:8000/api/login", Login).
 
 login_no_accounts() ->
 	Login = "{\"username\":\"Eva\", \"password\": \"test\"}",
 	{200,[{<<"status">>,<<"ok">>},
 		  {<<"sessionId">>,_},
-          {<<"user">>,{struct,[{<<"displayName">>,<<"AdamDisplay">>},{<<"email">>,<<"adam@gmail.com">>}]}},
+          {<<"user">>,{struct,[{<<"displayName">>,<<"EvaDisplay">>},{<<"email">>,<<"adam@gmail.com">>}]}},
           {<<"accounts">>,[]}]} = rest_req(post, "http://localhost:8000/api/login", Login).
 
 login_invalid_password() ->

@@ -88,6 +88,7 @@ insert_test_data() ->
 						id={"0", "0"},
 						user_id="0",
 						display_name="AdamAccount1",
+						storage_id=ftp,
 						authentication = #skr_auth_basic {
 							url="ftp://myftp",
 							provider=ftp,
