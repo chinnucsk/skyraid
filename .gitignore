@@ -6,5 +6,6 @@ rel/skyraid/
 .idea/
 *.patch
 *.swp
+*.dump
 log/
 rel/vars/dev*vars.config

@@ -51,7 +51,7 @@ init([]) ->
                {log_dir, "priv/log"},
                {dispatch, Dispatch}],
                
-  lager:info("Starting skyraid_webmachine with the following WebConfig: ~s :~s ", [Ip, Port]),
+  lager:info("Starting skyraid_webmachine with the following WebConfig( ~s:~w )", [Ip, Port]),
 
   Web = {webmachine_mochiweb, {webmachine_mochiweb, start, [WebConfig]}, permanent, 5000, worker, dynamic},
   Processes = [Web],

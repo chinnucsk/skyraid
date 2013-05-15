@@ -4,13 +4,10 @@
 @set verbose=NO
 @set quiet=NO
 
-
- 
 @set release_lib=rel\skyraid\lib\
-@set release_erts_bin=%CD%\rel\skyraid\erts-*\bin
+@set release_erts_bin=%CD%\rel\skyraid\erts-5.10.1\bin
 @set skyraid_src=%CD%\apps\skyraid
 @set skyraid_webmachine_src=%CD%\apps\skyraid_webmachine
-
  
 @if "%1"=="usage" @goto usage
 @if "%1"=="compile" @goto compile
@@ -21,11 +18,12 @@
 @if "%1"=="relclean" @goto relclean
 @if "%1"=="stage" @goto stage
 @if "%1"=="skyraid" @goto skyraid
+@if "%1"=="observer" @goto observer
 @echo Unknown command: "%1"
 
  
 :usage
-@echo Usage: %~n0 [compile^|test^|deps^|clean^|rel^|relclean^|stage^|skyraid^]
+@echo Usage: %~n0 [compile^|test^|deps^|clean^|rel^|relclean^|stage^|skyraid^|observer^]
 @goto :EOF
 
 :compile
@@ -49,7 +47,8 @@
 @goto :EOF
 
 :relclean
-@rem %release_erts_bin%\epmd.exe -kill
+%release_erts_bin%\epmd.exe -kill
+@echo Are you sure you want to delete the release?
 @rmdir /S rel\skyraid
 @goto :EOF
  
@@ -60,7 +59,10 @@
 @mklink /D %release_lib%skyraid_webmachine-1 %skyraid_webmachine_src%
 @goto :EOF
 
- 
-:skyraid:
+:skyraid
 "rel/skyraid/bin/skyraid" %2
+@goto :EOF
+
+:observer
+erl -sname observer -hidden -setcookie skyraid -run observer
 @goto :EOF
