@@ -1,0 +1,12 @@
+{application, skyraid_ranch,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { skyraid_ranch_app, []}},
+  {env, []}
+ ]}.
