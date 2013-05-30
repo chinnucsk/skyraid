@@ -45,7 +45,7 @@ loop(Socket, Transport, State) ->
  
 
 handle(State, Data) ->
-    ?DEBUG("Command received ~p~n", [Data]),
+    ?DEBUG({"Command received", Data}),
     Commands = parse_commands(Data),
     lists:foldl(fun process_command/2, State, Commands).
 
@@ -287,7 +287,7 @@ response_string_test() ->
 	Expected = response_string(230, Msg).
 
 
-user_cmd_parse_test() ->
+cmd_parse_test() ->
 	[ {"USER", [<<"Adam">>]} ] = parse_commands(<<"USER Adam\r\n">>),
 	[ {"USER", [<<"Adam">>]}, {"CMD", [<<"1">>, <<"2">>]} ] = parse_commands(<<"USER Adam\r\nCMD 1 2\r\n">>).
 

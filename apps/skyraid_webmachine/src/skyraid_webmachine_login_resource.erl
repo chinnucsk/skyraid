@@ -39,7 +39,7 @@ process_post(ReqData, Context) ->
 %% ====================================================================
 to_json(SessionRef, SessionInfo) ->
 	{User, Accounts} = session_info_to_proplist(SessionInfo),
-	PL = [{status, ok}, {sessionId, list_to_binary(pid_to_list(SessionRef))}, User, Accounts],
+	PL = [{status, ok}, {sessionId, base64:encode(term_to_binary(SessionRef))}, User, Accounts],
 	mochijson2:encode(PL).
 
 to_json({error, Error}) ->
@@ -92,7 +92,7 @@ to_json_normal_test() ->
 	SessionInfo = #skr_session_info{timestamp=12, user=Adam, accounts=[AdamAccount1]},
 
 	Expected = {struct,[{<<"status">>,<<"ok">>},
-                   		{<<"sessionId">>,<<"<0.4.1>">>},
+                   		{<<"sessionId">>,<<"g2dkAA1ub25vZGVAbm9ob3N0AAAABAAAAAEA">>},
                    		{<<"user">>,{struct,[{<<"displayName">>,<<"AdamDisplay">>},{<<"email">>,<<"adam@gmail.com">>}]}},
                    		{<<"accounts">>,{struct,[{<<"id">>,<<"0.0">>},{<<"name">>,<<"AdamAccount1">>}, {<<"provider">>, <<"ftp">>}]}}]},
 
@@ -111,7 +111,7 @@ to_json_no_account_test() ->
 	SessionInfo = #skr_session_info{timestamp=12, user=Adam, accounts=[]},
 
 	Expected = {struct,[{<<"status">>,<<"ok">>},
-                   		{<<"sessionId">>,<<"<0.4.1>">>},
+                   		{<<"sessionId">>,<<"g2dkAA1ub25vZGVAbm9ob3N0AAAABAAAAAEA">>},
                    		{<<"user">>,{struct,[{<<"displayName">>,<<"AdamDisplay">>},{<<"email">>,<<"adam@gmail.com">>}]}},
                    		{<<"accounts">>,[]}]},
 

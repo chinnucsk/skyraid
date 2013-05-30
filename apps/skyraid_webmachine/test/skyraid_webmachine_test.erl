@@ -19,7 +19,9 @@ skyraid_webmachine_test_() ->
 
 			?T(get_accounts_normal),
 			?T(get_account_normal),
-			?T(get_all_accounts)
+			?T(get_all_accounts),
+			?T(get_file_normal),
+			?T(put_file_normal)
 		] 
 	}.
 
@@ -34,7 +36,7 @@ teardown(_Any) ->
 login_normal() ->
 	Login = "{\"username\":\"Adam\", \"password\": \"test\"}",
 	{200,[	{<<"status">>,<<"ok">>},
-          	{<<"sessionId">>,<<"<0.204.0>">>},
+          	{<<"sessionId">>,_},
 			{<<"user">>,{struct,[{<<"displayName">>,<<"AdamDisplay">>},{<<"email">>,<<"adam@gmail.com">>}]}},
             {<<"accounts">>,{struct,[{<<"id">>,<<"0.0">>},{<<"name">>,<<"AdamAccount1">>},{<<"provider">>,<<"ftp">>}]}}]} = rest_req(post, "http://localhost:8000/api/login", Login).
 
@@ -73,7 +75,25 @@ get_accounts_normal() ->
 get_account_normal() ->
 	{200, [{<<"status">>,<<"ok">>}, {<<"accounts">>, _Accounts }]} = rest_req("http://localhost:8000/api/account/0/0").
 
+get_file_normal() ->
+	{200, "here comes the file"} = rest_req(text, "http://localhost:8000/api/file/myfile.txt").
+
+put_file_normal() ->
+	Login = "{\"username\":\"Adam\", \"password\": \"test\"}",
+	{200,[_,{<<"sessionId">>, SessionId}, _, _]} = rest_req(post, "http://localhost:8000/api/login", Login),
+	?DEBUG({session, SessionId}),
+	Bin = "Here comes the sun",
+	Header = [{"Authorization", binary_to_list(SessionId)}],
+	{200, Bin} = rest_req(put, "http://localhost:8000/api/file/myfile.txt", Header, "text/plain", Bin).
+
 rest_req(URL) ->
+	rest_req(json, URL).
+
+rest_req(text, URL) ->
+	{ok, {{_V, ReturnCode, _R}, _H, ResponseBody}} = httpc:request(URL),
+	{ReturnCode, ResponseBody};
+
+rest_req(json, URL) ->
 	{ok, {{_V, ReturnCode, _R}, _H, ResponseBody}} = httpc:request(URL),
 	Response = case mochijson2:decode(ResponseBody) of
 					{struct, ResponseTerm} -> ResponseTerm;
@@ -82,10 +102,21 @@ rest_req(URL) ->
 	{ReturnCode, Response}.
 
 rest_req(Method, URL, Body) ->
+	rest_req(Method, URL, "application/json", Body).
+
+rest_req(Method, URL, "application/json" = Type, Body) ->
 	Header = [],
-	Type = "application/json",
 	HTTPOptions = [],
 	Options = [],
 	{ok, {{_V, ReturnCode, _R}, _H, ResponseBody}} = httpc:request(Method, {URL, Header, Type, Body}, HTTPOptions, Options),
 	{struct, ResponseTerm} = mochijson2:decode(ResponseBody),
-	{ReturnCode, ResponseTerm}.
+	{ReturnCode, ResponseTerm};
+
+rest_req(Method, URL, Type, Body) ->
+	rest_req(Method, URL, [], Type, Body).
+
+rest_req(Method, URL, Header, Type, Body) ->
+	HTTPOptions = [],
+	Options = [],
+	{ok, {{_V, ReturnCode, _R}, _H, ResponseBody}} = httpc:request(Method, {URL, Header, Type, Body}, HTTPOptions, Options),
+	{ReturnCode, ResponseBody}.

@@ -15,6 +15,8 @@ all_test_() ->
 			?T(login_invalid_password),
 			?T(login_invalid_username_password),
 			?T(logout_normal),
+			?T(get_session_normal),
+			?T(get_session_not_found),
 			?T(write_chunked_normal),
 			?T(write_file_normal),
 			?T(read_file_normal)
@@ -51,6 +53,14 @@ logout_normal() ->
 	{ok, _Info} = skyraid_user_session:info(Session),
 	ok = skyraid:logout(Session),
 	?assertException(exit, _, skyraid_user_session:info(Session)).
+
+get_session_normal() ->
+	{ok, Session} = skyraid:login(<<"Adam">>, <<"test">>),
+	{ok, #skr_session_info{}} = skyraid:get_session(Session).
+
+get_session_not_found() ->
+	Session = list_to_pid("<0.1.1>"),
+	{error, session_not_found} = skyraid:get_session(Session).
 
 %%add_account() ->
 %%	{ok, Session} = skyraid:login(<<"Adam">>, <<"test">>),

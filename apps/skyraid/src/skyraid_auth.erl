@@ -2,7 +2,7 @@
 
 -include("skyraid.hrl").
 
--export([authenticate/1, login/1, login/2, logout/1]).
+-export([authenticate/1, login/1, login/2, logout/1, info/1]).
 
 
 authenticate(Provider) when is_atom(Provider) ->
@@ -45,6 +45,13 @@ login(#skr_auth_reqtoken{provider=Provider}=RT) ->
 
 logout(SessionRef) ->
 	skyraid_user_session_sup:stop_session(SessionRef).
+
+info(SessionRef) ->
+	case catch skyraid_user_session:info(SessionRef) of
+		{'EXIT', {noproc, _}} -> {error, session_not_found};
+		Response -> Response
+	end.
+		
 
 validate(Username, Password) ->
 	 case skyraid_user_repo:get_user(Username) of

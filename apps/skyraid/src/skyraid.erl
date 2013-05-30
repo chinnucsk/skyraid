@@ -3,7 +3,7 @@
 
 -export([
 	start/0, stop/0,
-	register/1, authenticate/1, login/2, login/1, logout/1,
+	register/1, authenticate/1, login/2, login/1, logout/1, get_session/1,
 	add_account/2, 
 	file_list/2, file_open/3, file_close/1, file_write/2, file_write/4, file_write/5, file_read/1, file_read/3, file_read/4
 ]).
@@ -52,6 +52,10 @@ login(#skr_auth_reqtoken{}=RT) ->
 -spec logout(session_ref()) -> ok | {error, term()}.
 logout(SessionRef) ->
 	skyraid_auth:logout(SessionRef).
+
+-spec get_session(session_ref()) -> {ok, skr_session_info()} | {error, term()}.
+get_session(SessionRef) ->
+	skyraid_auth:info(SessionRef).
 
 -spec add_account(session_ref(), skr_auth_reqtoken()) -> {ok, skr_session_info()} | {error, term()}.
 add_account(SessionRef, #skr_auth_reqtoken{}=RT) ->
