@@ -39,7 +39,7 @@ login(#skr_auth_reqtoken{provider=Provider}=RT) ->
     case Provider of
 	dropbox ->
 	    {ok, AT} = skyraid_storage_dropbox:access_token(RT),
-	    {ok, #skr_account{id=ID}} =
+	    {ok, #skr_account{storage_id=ID}} =
 		skyraid_storage_dropbox:account_info(AT),
 	    {ok, #skr_account{user_id=UserID}} =
 		skyraid_account_repo:get(ID),
