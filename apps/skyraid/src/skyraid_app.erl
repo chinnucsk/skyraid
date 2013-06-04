@@ -12,7 +12,7 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
-	?INFO("Starting skyraid"),
+    ?INFO("Starting skyraid"),
     skyraid_sup:start_link().
 
 stop(_State) ->

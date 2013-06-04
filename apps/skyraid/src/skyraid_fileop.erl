@@ -5,26 +5,33 @@
 
 -module(skyraid_fileop).
 -behaviour(gen_fsm).
--export([init/1, state_name/2, state_name/3, handle_event/3, handle_sync_event/4, handle_info/3, terminate/3, code_change/4]).
+-export([init/1,
+	 state_name/2,
+	 state_name/3,
+	 handle_event/3,
+	 handle_sync_event/4,
+	 handle_info/3,
+	 terminate/3,
+	 code_change/4]).
 
 %% ====================================================================
 %% API functions
 %% ====================================================================
--export([start_link/2]).	
+-export([start_link/2]).
 
 start_link(FileName, Opts) ->
-	gen_fsm:start_link(?MODULE, [FileName, Opts], []).
+    gen_fsm:start_link(?MODULE, [FileName, Opts], []).
 
 %% ====================================================================
-%% State 
+%% State
 %% ====================================================================
 -record(state, {
-	file :: string(),
-	opts
-}).
+	  file :: string(),
+	  opts
+	 }).
 
 %% ====================================================================
-%% Behavioural functions 
+%% Behavioural functions
 %% ====================================================================
 
 init([FileName, Opts]) ->
