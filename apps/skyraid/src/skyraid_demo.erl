@@ -13,9 +13,9 @@ run() ->
 	{ok, _File} = skyraid:file_read(SessionRef, dropbox, "master_slave.erl", []),
 	{ok, _MetaData} = skyraid:file_write(SessionRef, dropbox, "howdy.txt", <<"Writing to dropbox">>, []),
 	{ok, _} = skyraid:add_account(SessionRef, #skr_account{
-										storage_id=ftp,
-										authentication=#skr_auth_basic{url="ftp://myftp:8080", provider=ftp, username= <<"Testing">>, password= <<"Test">>}}),
-	{ok, _} = skyraid:file_list(SessionRef, ftp).
+						     storage_id=ftp,
+						     authentication=#skr_auth_basic{url="ftp://myftp:8080", provider=ftp, username= <<"Testing">>, password= <<"Test">>}}),
+    {ok, _} = skyraid:file_list(SessionRef, ftp).
 
 run(Provider, Demo) ->
 	{ok, #skr_auth_reqtoken{url=URL} = RT} = skyraid:authenticate(Provider),
@@ -46,7 +46,7 @@ read(AT) ->
 
 launch_user_authentication(URL) ->
 	process_flag(trap_exit, true),
-	Cmd = case os:type() of 
+	Cmd = case os:type() of
 			{win, _Osname} -> "start ";
 			{unix, _Osname} -> "epiphany "
 		end,
@@ -58,10 +58,10 @@ launch_user_authentication(URL) ->
 	end.
 
 await_user(Port) ->
-	receive 
+	receive
 		{'EXIT', Port, _} -> ok;
 		_ -> await_user(Port)
-	end. 
+	end.
 
 ask_for_pincode(#skr_auth_reqtoken{}=RT) ->
 	PinCode = string:strip(io:get_line("Enter pin code:"), both, $\n),

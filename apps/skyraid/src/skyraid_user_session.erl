@@ -25,9 +25,9 @@ get_authentication(SessionRef, Storage) ->
     gen_server:call(SessionRef, {get_authentication, Storage}).
 
 %% ====================================================================
-%% State 
+%% State
 %% ====================================================================
--record(state, 
+-record(state,
 {
     timestamp = erlang:now(),
     user,
@@ -35,7 +35,7 @@ get_authentication(SessionRef, Storage) ->
 }).
 
 %% ====================================================================
-%% Behavioural functions 
+%% Behavioural functions
 %% ====================================================================
 
 init([#skr_user{id=UserId}=User]) ->

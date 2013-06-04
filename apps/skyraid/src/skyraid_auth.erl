@@ -34,7 +34,7 @@ login(Username, Password) ->
 
 login(#skr_auth_reqtoken{provider=Provider}=RT) ->
 	case Provider of
-		dropbox -> 
+		dropbox ->
 			{ok, AT} = skyraid_storage_dropbox:access_token(RT),
 			{ok, #skr_account{id=ID}} = skyraid_storage_dropbox:account_info(AT),
 			{ok, #skr_account{user_id=UserID}} = skyraid_account_repo:get(ID),
@@ -51,13 +51,13 @@ info(SessionRef) ->
 		{'EXIT', {noproc, _}} -> {error, session_not_found};
 		Response -> Response
 	end.
-		
+
 
 validate(Username, Password) ->
 	 case skyraid_user_repo:get_user(Username) of
 	 	{ok, U} ->
 			case {U#skr_user.username, U#skr_user.password} of
-				{Username, Password} -> 
+				{Username, Password} ->
 					{ok, U};
 				{Username, _} ->
 					{error, invalid_password}

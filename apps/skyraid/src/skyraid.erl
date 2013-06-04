@@ -4,7 +4,7 @@
 -export([
 	start/0, stop/0,
 	register/1, authenticate/1, login/2, login/1, logout/1, get_session/1,
-	add_account/2, 
+	add_account/2,
 	file_list/2, file_open/3, file_close/1, file_write/2, file_write/4, file_write/5, file_read/1, file_read/3, file_read/4
 ]).
 
@@ -45,7 +45,7 @@ register(#skr_auth_reqtoken{}=RT) ->
 login(Username, Password) ->
 	skyraid_auth:login(Username, Password).
 
--spec login(skr_auth_reqtoken()) -> {ok, session_ref()} | {error, term()}.	
+-spec login(skr_auth_reqtoken()) -> {ok, session_ref()} | {error, term()}.
 login(#skr_auth_reqtoken{}=RT) ->
 	skyraid_auth:login(RT).
 
@@ -69,7 +69,7 @@ add_account(SessionRef, #skr_account{}=A) ->
 	{ok, #skr_session_info{user=#skr_user{id=UserID}}} = skyraid_user_session:info(SessionRef),
 	{ok, LocalAccount} = skyraid_account_repo:new(A#skr_account{user_id=UserID}),
 	skyraid_user_session:add_account(SessionRef, LocalAccount).
-	
+
 file_list(SessionRef, Storage) ->
 	{ok, T} = skyraid_user_session:get_authentication(SessionRef, Storage),
 	skyraid_storage:file_list(T).
