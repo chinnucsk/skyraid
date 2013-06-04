@@ -14,12 +14,12 @@
 -export([start_link/0, start_fileop/2]).
 
 start_link() ->
-	supervisor:start_link({local, ?MODULE}, ?MODULE, []).
+    supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
 start_fileop(FileName, Opts) ->
-	supervisor:start_child(?MODULE, ?CHILD(make_ref(), FileName, Opts)).
+    supervisor:start_child(?MODULE, ?CHILD(make_ref(), FileName, Opts)).
 %% ====================================================================
-%% Behavioural functions 
+%% Behavioural functions
 %% ====================================================================
 
 init([]) ->
