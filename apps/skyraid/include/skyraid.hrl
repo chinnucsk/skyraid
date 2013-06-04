@@ -26,23 +26,23 @@
 
 -record(skr_quota_info,
 {
-	shared :: number(),
-	quota :: number(),
-	normal :: number()
+	shared :: number(),	%% Shared number of bytes
+	quota :: number(),	%% Total amount of bytes available for this account
+	normal :: number() 	%% 
 }).
 -type skr_quota_info() :: #skr_quota_info{}.
 
 -record(skr_account, 
 {
-	id :: term(), %% The internal id of this account
-	ext_id :: binary(), %% The external id of this account(id at the provider)
-	user_id :: term(),
-	display_name :: binary(),
-	country :: binary(),
-	email :: binary(),
-	storage_id :: atom(),
-	authentication :: term(),
-	quota_info :: skr_quota_info()	
+	id :: term(), 					%% Internal id of this account
+	ext_id :: binary(), 			%% External id of this account(id at the provider)
+	user_id :: term(), 				%% Id of the user owning the account
+	display_name :: binary(),		%% Name of the account
+	country :: binary(),			%% Country of the account
+	email :: binary(),				%% Email of the account
+	provider :: atom(),				%% Provider of this account(local, dropbox, ...)
+	authentication :: term(),		%% Authentication for this account
+	quota_info :: skr_quota_info()	%% The quota for this account
 }).
 -type skr_account() :: #skr_account{}.
 
@@ -53,6 +53,16 @@
 	url :: string()
 }).
 -type skr_storage() :: #skr_storage{}.
+
+-record(skr_file_info, 
+{
+	size :: number(),
+	rev :: string(),
+	path :: string(),
+	modified :: term(),
+	mime_type :: string()
+}).
+-type skr_file_info() :: #skr_file_info{}.
 
 %% ===================================================================
 %% Authentication records
@@ -65,6 +75,7 @@
 	username :: binary(),
 	password :: binary()	
 }).
+-type skr_auth_basic() :: skr_auth_basic().
 
 -record(skr_auth_reqtoken, 
 {

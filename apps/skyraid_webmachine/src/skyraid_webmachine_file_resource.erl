@@ -26,7 +26,7 @@ is_authorized(ReqData, Context) ->
 		undefined -> 
 			{true, ReqData, Context};
 		Token -> 
-			Session = binary_to_term(base64:decode(Token)),
+			_Session = binary_to_term(base64:decode(Token)),
 			{true, ReqData, Context}
 	end.
 

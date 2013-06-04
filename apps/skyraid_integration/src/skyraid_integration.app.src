@@ -1,0 +1,12 @@
+{application, skyraid_integration,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { skyraid_integration_app, []}},
+  {env, []}
+ ]}.

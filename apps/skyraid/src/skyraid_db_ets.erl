@@ -77,18 +77,23 @@ insert_test_data() ->
 			display_name = <<"AdamDisplay">>, 
 			email = <<"adam@gmail.com">>},
 
-	Eva = #skr_user{
-			id="1",
-			username = <<"Eva">>, 
-	  		password = <<"test">>, 
-	  		display_name = <<"EvaDisplay">>, 
-	  		email = <<"adam@gmail.com">>},
+	AdamLocal = #skr_account {
+					id={"0", "0"},
+					user_id="0",
+					provider=local,
+					email = <<"adam@gmail.com">>,
+					authentication = #skr_auth_basic {
+						provider=local,
+						username= <<"Adam">>,
+						password= <<"test">>
+					}
+				},
 
-	AdamAccount1 = #skr_account {
+	AdamFtpAccount1 = #skr_account {
 						id={"0", "0"},
 						user_id="0",
-						display_name="AdamAccount1",
-						storage_id=ftp,
+						display_name="AdamFtpAccount1",
+						provider=ftp,
 						authentication = #skr_auth_basic {
 							url="ftp://myftp",
 							provider=ftp,
@@ -97,10 +102,18 @@ insert_test_data() ->
 						}
 					},
 
+	Eva = #skr_user {
+			id="1",
+			username = <<"Eva">>, 
+	  		password = <<"test">>, 
+	  		display_name = <<"EvaDisplay">>, 
+	  		email = <<"adam@gmail.com">>},
+
 	ets:insert(users, Adam),
 	ets:insert(users, Eva),
 
-	ets:insert(accounts, AdamAccount1).
+	ets:insert(accounts, AdamLocal),
+	ets:insert(accounts, AdamFtpAccount1).
 
 %% ====================================================================
 %% Unit Tests 

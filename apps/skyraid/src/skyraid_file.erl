@@ -28,6 +28,9 @@ read_file(Session, FileName, Opts) ->
 	Storage = get_storage(Opts),
 	skyraid_storage:read_file(Storage, Session, FileName, Opts).
 
+%%list(Session, Storage) ->
+%%	skyraid_storage:file_list(Storage, Session).
+
 %% ====================================================================
 %% Internal functions
 %% ====================================================================

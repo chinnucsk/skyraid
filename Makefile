@@ -8,6 +8,12 @@ compile:
 test:
 	./rebar eunit skip_deps=true
 
+doc:
+	./rebar doc skip_deps=true
+
+docclean:
+	rm -rf apps/*/doc
+
 deps:
 	./rebar get-deps
 

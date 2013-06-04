@@ -7,5 +7,6 @@ rel/skyraid/
 *.patch
 *.swp
 *.dump
+*.sublime-workspace
 log/
 rel/vars/dev*vars.config

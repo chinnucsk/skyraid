@@ -13,7 +13,7 @@ run() ->
 	{ok, _File} = skyraid:file_read(SessionRef, dropbox, "master_slave.erl", []),
 	{ok, _MetaData} = skyraid:file_write(SessionRef, dropbox, "howdy.txt", <<"Writing to dropbox">>, []),
 	{ok, _} = skyraid:add_account(SessionRef, #skr_account{
-										storage_id=ftp,
+										provider=ftp,
 										authentication=#skr_auth_basic{url="ftp://myftp:8080", provider=ftp, username= <<"Testing">>, password= <<"Test">>}}),
 	{ok, _} = skyraid:file_list(SessionRef, ftp).
 

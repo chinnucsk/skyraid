@@ -49,7 +49,7 @@ request_token() ->
 	request_token(?key, ?secret).
 
 to_account({Account}, AccessToken) ->
-	build_account(Account, #skr_account{storage_id=dropbox, authentication=AccessToken}).
+	build_account(Account, #skr_account{provider=dropbox, authentication=AccessToken}).
 
 build_account([], A) ->
 	A;
@@ -115,6 +115,6 @@ to_account_test() ->
 	    		{<<"normal">>,1425347}]}},
 	    		{<<"email">>,<<"apa.nilsson@gmail.com">>}]},
 	
- 	#skr_account{display_name = <<"Apa Nilsson">>} = to_account(A, #skr_account{storage_id=dropbox}).
+ 	#skr_account{display_name = <<"Apa Nilsson">>} = to_account(A, #skr_account{provider=dropbox}).
 
  -endif.

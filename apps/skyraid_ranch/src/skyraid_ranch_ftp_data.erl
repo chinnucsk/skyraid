@@ -1,5 +1,5 @@
 -module(skyraid_ranch_ftp_data).
--export([start_pasv/0, stop_pasv/1, connect/1, put_file/3, get_file/3]).
+-export([start_pasv/0, stop_pasv/1, connect/1, put_file/3, get_file/3, list_files/2]).
 
 -include_lib("skyraid/include/skyraid.hrl").
  
@@ -68,6 +68,15 @@ get_file(Session, FileName, S) ->
 		{error, Error} -> {error, Error}
 	end.
 
+list_files(_Session, S) ->
+	case connect(S) of 
+		{ok, #state{data_socket=DataSocket} = NewState} ->
+			do_send(DataSocket, <<"-rwxrwxrwx 1 stefan stefa 2200 Jan  1  1970 serverflags.txt">>, NewState),
+			do_close(DataSocket),
+			{ok, S};
+		{error, Error} -> {error, Error}
+	end.
+
 
 do_recv(Socket, Bs) ->
     case gen_tcp:recv(Socket, 0) of
@@ -77,7 +86,7 @@ do_recv(Socket, Bs) ->
             {ok, list_to_binary(Bs)}
     end.
 
-do_send(Socket, Bin, S) ->
+do_send(Socket, Bin, _S) ->
 	?DEBUG({do_send, Bin}),
 	gen_tcp:send(Socket, Bin).
 

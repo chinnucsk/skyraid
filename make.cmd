@@ -6,11 +6,12 @@
 
 @set release_lib=rel\skyraid\lib\
 @set release_erts_bin=%CD%\rel\skyraid\erts-5.10.1\bin
-@set skyraid_src=%CD%\apps\skyraid
-@set skyraid_webmachine_src=%CD%\apps\skyraid_webmachine
+@set skyraid_version=1
  
 @if "%1"=="usage" @goto usage
 @if "%1"=="compile" @goto compile
+@if "%1"=="doc" @goto doc
+@if "%1"=="docclean" @goto docclean
 @if "%1"=="test" @goto test
 @if "%1"=="deps" @goto deps
 @if "%1"=="clean" @goto clean
@@ -23,11 +24,19 @@
 
  
 :usage
-@echo Usage: %~n0 [compile^|test^|deps^|clean^|rel^|relclean^|stage^|skyraid^|observer^]
+@echo Usage: %~n0 [compile^|doc^|docclean^|test^|deps^|clean^|rel^|relclean^|stage^|skyraid^|observer^]
 @goto :EOF
 
 :compile
 @rebar compile
+@goto :EOF
+
+:doc
+@rebar doc skip_deps=true
+@goto :EOF
+
+:docclean
+@for /D %%a in (apps/*) do rmdir %CD%\apps\%%a\doc /S /Q
 @goto :EOF
 
 :test
@@ -53,10 +62,8 @@
 @goto :EOF
  
 :stage
-@rmdir /S %release_lib%skyraid-1
-@rmdir /S %release_lib%skyraid_webmachine-1
-@mklink /D %release_lib%skyraid-1 %skyraid_src%
-@mklink /D %release_lib%skyraid_webmachine-1 %skyraid_webmachine_src%
+@for /D %%a in (apps/*) do rmdir %release_lib%%%a-%skyraid_version% /S /Q
+@for /D %%a in (apps/*) do mklink /J %CD%\%release_lib%%%a-%skyraid_version% %CD%\apps\%%a
 @goto :EOF
 
 :skyraid

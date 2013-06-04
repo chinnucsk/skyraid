@@ -19,7 +19,8 @@ all_test_() ->
 			?T(get_session_not_found),
 			?T(write_chunked_normal),
 			?T(write_file_normal),
-			?T(read_file_normal)
+			?T(read_file_normal),
+			?T(file_list_normal)
 		] 
 	}.
 
@@ -84,3 +85,8 @@ read_file_normal() ->
 	{ok, Session} = skyraid:login(<<"Adam">>, <<"test">>),
 	ok = skyraid:file_write(Session, "ReadFile.txt", <<"hello world">>, [{storage, [local]}]),
 	?assertEqual({ok, <<"hello world">>}, skyraid:file_read(Session, "ReadFile.txt", [{storage, [local]}])).
+
+file_list_normal() ->
+	ok.
+%%	{ok, Session} = skyraid:login(<<"Adam">>, <<"test">>),
+%%	{ok, _FileList} = skyraid:file_list(Session).

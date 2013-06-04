@@ -54,7 +54,7 @@ handle_call({add_account, NewAccount}, _From, #state{accounts=CurrentAccounts}=S
     {reply, {ok, Info}, NewState};
 
 handle_call({get_authentication, Storage}, _From, #state{user=#skr_user{accounts=Accounts}}=S) ->
-    Replay = case [Auth || #skr_account{storage_id=AS, authentication=Auth} <- Accounts, Storage == AS] of
+    Replay = case [Auth || #skr_account{provider=AS, authentication=Auth} <- Accounts, Storage == AS] of
                 [Auth] -> {ok, Auth};
                 [] -> {error, not_found}
             end,
