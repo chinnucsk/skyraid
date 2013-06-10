@@ -35,6 +35,7 @@
 
 -record(skr_account, {
 	  id :: term(), %% The internal id of this account
+	  provider :: atom(),
 	  ext_id :: binary(), %% The external id of this account(id at the provider)
 	  user_id :: term(),
 	  display_name :: binary(),
