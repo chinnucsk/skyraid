@@ -74,6 +74,8 @@
 	  password :: binary()
 	 }).
 
+-type skr_auth_basic() :: #skr_auth_basic{}.
+
 -record(skr_auth_reqtoken, {
 	  url :: string(),
 	  provider :: atom(),
