@@ -8,5 +8,7 @@ rel/skyraid/
 *.swp
 *.dump
 *.sublime-workspace
+*.tags
+*.sublime-project
 log/
 rel/vars/dev*vars.config

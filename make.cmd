@@ -1,9 +1,11 @@
 @rem
 @echo on
 @setlocal
+@setlocal enabledelayedexpansion
 @set verbose=NO
 @set quiet=NO
 
+@set tools_lib=%CD%\tools\win
 @set release_lib=rel\skyraid\lib\
 @set release_erts_bin=%CD%\rel\skyraid\erts-5.10.1\bin
 @set skyraid_version=1
@@ -18,6 +20,7 @@
 @if "%1"=="rel" @goto rel
 @if "%1"=="relclean" @goto relclean
 @if "%1"=="stage" @goto stage
+@if "%1"=="ctags" @goto ctags
 @if "%1"=="skyraid" @goto skyraid
 @if "%1"=="observer" @goto observer
 @echo Unknown command: "%1"
@@ -40,7 +43,8 @@
 @goto :EOF
 
 :test
-@rebar eunit skip_deps=true
+@echo 'Start running tests'
+@rebar eunit skip_deps=true | findstr  /c:"eunit" /c:"tests" /c:"*failed*" /c:"in function" /c:"Failed:"
 @goto :EOF
 
 :deps
@@ -64,6 +68,13 @@
 :stage
 @for /D %%a in (apps/*) do rmdir %release_lib%%%a-%skyraid_version% /S /Q
 @for /D %%a in (apps/*) do mklink /J %CD%\%release_lib%%%a-%skyraid_version% %CD%\apps\%%a
+@goto :EOF
+
+:ctags
+@set tagpath;
+@for /D %%a in (apps/*) do set tagpath=!tagpath! %CD%\apps\%%a\src
+@for /D %%a in (deps/*) do set tagpath=!tagpath! %CD%\deps\%%a\src
+@%tools_lib%\ctags.exe --languages=erlang --erlang-kinds=-dr -R -f .tags %tagpath% 
 @goto :EOF
 
 :skyraid
