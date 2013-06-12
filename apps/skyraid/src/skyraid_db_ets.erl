@@ -6,137 +6,136 @@
 -include_lib("eunit/include/eunit.hrl").
 -endif.
 
--export([init/0, close/0, create_user/1, create_storage/1, get_users/0, get_user/1, get_user_by_id/1]).
--export([create_account/1, get_account/2, get_accounts/1, get_all_accounts/0]).
+-export([init/0,
+	 close/0,
+	 create_user/1,
+	 create_storage/1,
+	 get_users/0,
+	 get_user/1,
+	 get_user_by_id/1]).
+-export([create_account/1,
+	 get_account/2,
+	 get_accounts/1,
+	 get_all_accounts/0]).
 
 init() ->
-	users = ets:new(users, [set, {keypos, 3}, named_table, public]),
-	accounts = ets:new(accounts, [set, {keypos, 2}, named_table, public]),
-	storages = ets:new(storages, [set, named_table, public]),
-	insert_test_data(),
-	ok.
+    users = ets:new(users, [set, {keypos, 3}, named_table, public]),
+    accounts =
+	ets:new(accounts, [set, {keypos, 2}, named_table, public]),
+    storages = ets:new(storages, [set, named_table, public]),
+    insert_test_data(),
+    ok.
 
 close() ->
-	ok.
+    ok.
 
 get_users() ->
-	case ets:tab2list(users) of
-		Users -> {ok, Users}
-	end.
+    case ets:tab2list(users) of
+	Users -> {ok, Users}
+    end.
 
 
 get_user(Username) ->
-	case ets:lookup(users, Username) of
-		[] -> not_found;
-		[User] -> {ok, User}
-	end.
+    case ets:lookup(users, Username) of
+	[] -> not_found;
+	[User] -> {ok, User}
+    end.
 
 get_user_by_id(ID) ->
-	case ets:match_object(users, #skr_user{id=ID, _='_'}) of
-		[] -> not_found;
-		[User] -> {ok, User}
-	end.
+    case ets:match_object(users, #skr_user{id=ID, _='_'}) of
+	[] -> not_found;
+	[User] -> {ok, User}
+    end.
 
 
 create_user(#skr_user{} = User) ->
-	case ets:insert(users, User) of 
-		true-> {ok, User}; 
-		Any-> {error, Any}
-	end.
+    case ets:insert(users, User) of
+	true-> {ok, User};
+	Any-> {error, Any}
+    end.
 
 get_account(UserID, AccountID) ->
-	case ets:lookup(accounts, {UserID, AccountID}) of
-		[] -> not_found;
-		[Account] -> {ok, Account}
-	end.
+    case ets:lookup(accounts, {UserID, AccountID}) of
+	[] -> not_found;
+	[Account] -> {ok, Account}
+    end.
 
 get_accounts(UserID) ->
-	case ets:match_object(accounts, #skr_account{user_id=UserID, _='_'})  of
-		Accounts -> {ok, Accounts}
-	end.
+    case ets:match_object(accounts,
+			  #skr_account{user_id=UserID, _='_'})  of
+	Accounts -> {ok, Accounts}
+    end.
 
 get_all_accounts() ->
-	case ets:tab2list(accounts) of
-		Accounts -> {ok, Accounts}
-	end.
+    case ets:tab2list(accounts) of
+	Accounts -> {ok, Accounts}
+    end.
 
 create_account(Account) ->
-	case ets:insert(accounts, Account) of 
-		true-> {ok, Account}; 
-		Any-> {error, Any}
-	end.
+    case ets:insert(accounts, Account) of
+	true-> {ok, Account};
+	Any-> {error, Any}
+    end.
 
 create_storage(#skr_storage{} = Storage) ->
-	ets:insert(storages, Storage).
+    ets:insert(storages, Storage).
 
 insert_test_data() ->
-	Adam = #skr_user{
-			id="0",
-			username = <<"Adam">>, 
-			password = <<"test">>, 
-			display_name = <<"AdamDisplay">>, 
-			email = <<"adam@gmail.com">>},
+    Adam = #skr_user{
+	      id="0",
+	      username = <<"Adam">>,
+	      password = <<"test">>,
+	      display_name = <<"AdamDisplay">>,
+	      email = <<"adam@gmail.com">>},
 
-	AdamLocal = #skr_account {
-					id={"0", "0"},
-					user_id="0",
-					provider=local,
-					email = <<"adam@gmail.com">>,
-					authentication = #skr_auth_basic {
-						provider=local,
-						username= <<"Adam">>,
-						password= <<"test">>
-					}
-				},
+    Eva = #skr_user{
+	     id="1",
+	     username = <<"Eva">>,
+	     password = <<"test">>,
+	     display_name = <<"EvaDisplay">>,
+	     email = <<"adam@gmail.com">>},
 
-	AdamFtpAccount1 = #skr_account {
-						id={"0", "0"},
-						user_id="0",
-						display_name="AdamFtpAccount1",
-						provider=ftp,
-						authentication = #skr_auth_basic {
-							url="ftp://myftp",
-							provider=ftp,
-							username="User",
-							password="test"
-						}
-					},
+    AdamAccount1 = #skr_account {
+		      id={"0", "0"},
+		      user_id="0",
+		      display_name="AdamAccount1",
+		      storage_id=ftp,
+		      authentication = #skr_auth_basic {
+					  url="ftp://myftp",
+					  provider=ftp,
+					  username="User",
+					  password="test"
+					 }
+		     },
 
-	Eva = #skr_user {
-			id="1",
-			username = <<"Eva">>, 
-	  		password = <<"test">>, 
-	  		display_name = <<"EvaDisplay">>, 
-	  		email = <<"adam@gmail.com">>},
+    ets:insert(users, Adam),
+    ets:insert(users, Eva),
 
-	ets:insert(users, Adam),
-	ets:insert(users, Eva),
+    ets:insert(accounts, AdamAccount1).
 
-	ets:insert(accounts, AdamLocal),
-	ets:insert(accounts, AdamFtpAccount1).
 
 %% ====================================================================
-%% Unit Tests 
+%% Unit Tests
 %% ====================================================================
 -ifdef(TEST).
 skyraid_db_ets_test_() ->
-	{setup, fun setup/0, fun teardown/1,
-		[
-			{"get_user_tc", fun get_user_tc/0},
-			{"get_accounts_tc", fun get_accounts_tc/0},
-			{"get_all_accounts_tc", fun get_all_accounts_tc/0}
-		]
-	}.
+    {setup, fun setup/0, fun teardown/1,
+     [
+      {"get_user_tc", fun get_user_tc/0},
+      {"get_accounts_tc", fun get_accounts_tc/0},
+      {"get_all_accounts_tc", fun get_all_accounts_tc/0}
+     ]
+    }.
 
 setup() -> init().
 teardown(_) ->ok.
 
 get_user_tc() ->
-	{ok, #skr_user{username = <<"Adam">>}} = get_user(<<"Adam">>).
+    {ok, #skr_user{username = <<"Adam">>}} = get_user(<<"Adam">>).
 
 get_accounts_tc() ->
-	{ok, [#skr_account{user_id = "0"}]} = get_accounts("0").
+    {ok, [#skr_account{user_id = "0"}]} = get_accounts("0").
 
 get_all_accounts_tc() ->
-	{ok, [#skr_account{user_id = "0"}]} = get_all_accounts().
- -endif.
+    {ok, [#skr_account{user_id = "0"}]} = get_all_accounts().
+-endif.

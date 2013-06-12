@@ -5,7 +5,12 @@
 -module(skyraid_user_session).
 -include("skyraid.hrl").
 -behaviour(gen_server).
--export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
+-export([init/1,
+	 handle_call/3,
+	 handle_cast/2,
+	 handle_info/2,
+	 terminate/2,
+	 code_change/3]).
 
 %% ====================================================================
 %% API functions
@@ -25,9 +30,9 @@ get_authentication(SessionRef, Storage) ->
     gen_server:call(SessionRef, {get_authentication, Storage}).
 
 %% ====================================================================
-%% State 
+%% State
 %% ====================================================================
--record(state, 
+-record(state,
 {
     timestamp = erlang:now(),
     user,
@@ -35,7 +40,7 @@ get_authentication(SessionRef, Storage) ->
 }).
 
 %% ====================================================================
-%% Behavioural functions 
+%% Behavioural functions
 %% ====================================================================
 
 init([#skr_user{id=UserId}=User]) ->
@@ -45,19 +50,25 @@ init([#skr_user{id=UserId}=User]) ->
 
 handle_call(get_info, _From, S) ->
     Info = create_session_info(S),
-	{reply, {ok, Info}, S};
+    {reply, {ok, Info}, S};
 
-handle_call({add_account, NewAccount}, _From, #state{accounts=CurrentAccounts}=S) ->
+handle_call({add_account, NewAccount},
+	    _From,
+	    #state{accounts=CurrentAccounts}=S) ->
     %% TODO add check for already existing or?
     NewState = S#state{accounts=CurrentAccounts ++ [NewAccount]},
     Info = create_session_info(NewState),
     {reply, {ok, Info}, NewState};
 
-handle_call({get_authentication, Storage}, _From, #state{user=#skr_user{accounts=Accounts}}=S) ->
-    Replay = case [Auth || #skr_account{provider=AS, authentication=Auth} <- Accounts, Storage == AS] of
-                [Auth] -> {ok, Auth};
-                [] -> {error, not_found}
-            end,
+handle_call({get_authentication, Storage},
+	    _From, #state{user=#skr_user{accounts=Accounts}}=S) ->
+    Replay = case [Auth || #skr_account{storage_id=AS,
+					authentication=Auth} <-
+			       Accounts, Storage == AS] of
+		 [Auth] -> {ok, Auth};
+		 [] -> {error, not_found}
+	     end,
+
     {reply, Replay, S};
 
 handle_call(_Request, _From, State) ->
@@ -80,5 +91,9 @@ code_change(_OldVsn, State, _Extra) ->
 %% Internal functions
 %% ====================================================================
 
-create_session_info(#state{timestamp=TimeStamp, user=User, accounts=Accounts}) ->
-    #skr_session_info{timestamp=TimeStamp, user=User, accounts=Accounts}.
+create_session_info(#state{timestamp=TimeStamp,
+			   user=User,
+			   accounts=Accounts}) ->
+    #skr_session_info{timestamp=TimeStamp,
+		      user=User,
+		      accounts=Accounts}.

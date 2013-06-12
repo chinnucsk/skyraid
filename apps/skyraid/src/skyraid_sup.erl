@@ -24,9 +24,8 @@ start_link() ->
 %% ===================================================================
 
 init([]) ->
-	ok = skyraid_db:init(),
+    ok = skyraid_db:init(),
 
-	UsersSup = ?CHILD(skyraid_user_session_sup, worker),
+    UsersSup = ?CHILD(skyraid_user_session_sup, worker),
 
     {ok, { {one_for_one, 5, 10}, [UsersSup]} }.
-
