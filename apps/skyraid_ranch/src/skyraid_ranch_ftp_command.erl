@@ -4,7 +4,7 @@
 
 -export([user/2, pass/2, quit/1, pasv/1, opts/3, type/2, list/1, pwd/1, cwd/2, stor/2, retr/2]).
 
--include_lib("skyraid/include/skyraid.hrl").
+-include("../../skyraid/include/skyraid.hrl").
  
 -record(state, 
 {

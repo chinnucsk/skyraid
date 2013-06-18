@@ -1,6 +1,6 @@
 -module(skyraid_integration_dropbox).
 
--include_lib("skyraid/include/skyraid.hrl").
+-include_lib("../../skyraid/include/skyraid.hrl").
 
 -define(key, "6b8S6hN6SK2YvYySTfpVg").
 -define(secret, "obv1gjb2aoq1zg6").

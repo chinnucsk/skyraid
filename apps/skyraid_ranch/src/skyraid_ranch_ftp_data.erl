@@ -1,7 +1,7 @@
 -module(skyraid_ranch_ftp_data).
 -export([start_pasv/0, stop_pasv/1, connect/1, put_file/3, get_file/3, list_files/2]).
 
--include_lib("skyraid/include/skyraid.hrl").
+-include("../../skyraid/include/skyraid.hrl").
  
 -record(state, 
 {

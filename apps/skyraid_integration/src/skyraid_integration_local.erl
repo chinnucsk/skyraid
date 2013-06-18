@@ -1,6 +1,6 @@
 -module(skyraid_integration_local).
 
--include_lib("skyraid/include/skyraid.hrl").
+-include_lib("../../skyraid/include/skyraid.hrl").
 
 -behaviour(skyraid_account_provider).
 -export([init/0, create_token/0, authenticate/1, logout/1, account_info/1]).

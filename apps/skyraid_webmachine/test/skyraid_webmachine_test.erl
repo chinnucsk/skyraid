@@ -1,6 +1,6 @@
 -module(skyraid_webmachine_test).
 
--include_lib("skyraid/include/skyraid.hrl").
+-include("../../skyraid/include/skyraid.hrl").
 -include_lib("eunit/include/eunit.hrl").
 
 -define(T(TestName), {atom_to_list(TestName), fun TestName/0}).

@@ -1,6 +1,6 @@
 -module(skyraid_webmachine_file_resource).
 
--include_lib("skyraid/include/skyraid.hrl").
+-include("../../skyraid/include/skyraid.hrl").
 
 -export([init/1, allowed_methods/2, content_types_provided/2, content_types_accepted/2, is_authorized/2, to_text/2, from_text/2]).
 

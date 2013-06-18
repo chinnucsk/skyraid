@@ -1,6 +1,6 @@
 -module(skyraid_webmachine_user_resource).
 
--include_lib("skyraid/include/skyraid.hrl").
+-include("../../skyraid/include/skyraid.hrl").
 
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
