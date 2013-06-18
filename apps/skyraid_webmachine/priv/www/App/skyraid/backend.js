@@ -15,26 +15,27 @@ define(['durandal/system'], function (system) {
                 type: "PUT",
                 contentType:"application/json; charset=utf-8",
                 dataType: "json",
-                url: "http://localhost:80/api/user",
+                url: "http://localhost:8066/api/user",
                 data: JSON.stringify(register),
                 processData: false
             });
 
             return promise;
-        },          
+        },
 
         loginWithToken:function(Token) {
             //do some ajax and return a promise
         },
 
         login:function(Username, Password) {
+            system.log(Username);
             var login = {username: Username, password: Password};
 
             var promise = $.ajax({
                 type: "POST",
                 contentType:"application/json; charset=utf-8",
                 dataType: "json",
-                url: "http://localhost:80/api/login",
+                url: "http://localhost:8066/api/login",
                 data: JSON.stringify(login),
                 processData: false
             });

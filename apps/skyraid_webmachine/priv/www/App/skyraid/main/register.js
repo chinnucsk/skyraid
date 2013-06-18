@@ -9,7 +9,7 @@ define(['skyraid/backend','skyraid/home/user', 'durandal/app', 'durandal/plugins
     var Register = function () {
             backend.register(Username(), Password(), Email()).then(function(result) {
                 if (result.status == 'ok') {
-                    backend.login(this.username, this.password).then(function(result) {
+                    backend.login(Username(), Password()).then(function(result) {
                         user.displayName(result.user.displayName);
                         user.email(result.user.email);
                         user.accounts.push.apply(user.accounts, result.user.accounts);
@@ -21,10 +21,10 @@ define(['skyraid/backend','skyraid/home/user', 'durandal/app', 'durandal/plugins
             }, function(jqxhr) {
                 var response = $.parseJSON(jqxhr.responseText);
                 Alerts.push({message: response.error, priority: 'error'});
-            })
+            });
         };
 
-   	return {
+    return {
         username: Username,
         password: Password,
         email: Email,
@@ -32,5 +32,5 @@ define(['skyraid/backend','skyraid/home/user', 'durandal/app', 'durandal/plugins
         alerts: Alerts,
 
         register: Register
-    } 
+    };
 });
