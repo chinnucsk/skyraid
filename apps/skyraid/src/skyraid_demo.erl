@@ -7,8 +7,7 @@ run() ->
     skyraid:register(#skr_user{username = <<"Test">>,
 			       password = <<"test">>}),
     {ok, SessionRef} = skyraid:login(<<"Test">>, <<"test">>),
-    {ok, #skr_auth_reqtoken{url=URL}=RT} =
-	skyraid:authenticate(dropbox),
+    {ok, #skr_auth_reqtoken{url=URL}=RT} = skyraid:authenticate(dropbox),
     launch_user_authentication(URL),
     {ok, _} = skyraid:add_account(SessionRef, RT),
     {ok, _Files} = skyraid:file_list(SessionRef, dropbox),
@@ -35,16 +34,15 @@ run() ->
 
 
 run(Provider, Demo) ->
-    {ok, #skr_auth_reqtoken{url=URL} = RT} =
-	skyraid:authenticate(Provider),
+    {ok, #skr_auth_reqtoken{url=URL} = RT} = skyraid:authenticate(Provider),
     launch_user_authentication(URL),
     RTP = ask_for_pincode(RT),
     {ok, AT} = skyraid:authenticate(RTP),
     case Demo of
-	account -> account(AT);
-	files -> files(AT);
-	write -> write(AT);
-	read -> read(AT)
+		account -> account(AT);
+		files -> files(AT);
+		write -> write(AT);
+		read -> read(AT)
     end.
 
 account(AT) ->
@@ -56,9 +54,7 @@ files(AT) ->
     Files.
 
 write(AT) ->
-    ok = skyraid_storage:write_file(AT,
-				    "testing.txt",
-				    <<"hello my friend">>).
+    ok = skyraid_storage:write_file(AT, "testing.txt", <<"hello my friend">>).
 
 read(AT) ->
     {ok, File} = skyraid_storage:read_file(AT, "master_slave.erl"),
@@ -67,7 +63,8 @@ read(AT) ->
 launch_user_authentication(URL) ->
     process_flag(trap_exit, true),
     Cmd = case os:type() of
-	      {win, _Osname} -> "start ";
+          {win32, _Osname} -> "cmd /c start ";
+	      {win64, _Osname} -> "cmd /c start ";
 	      {unix, _Osname} -> "epiphany "
 	  end,
 
@@ -79,8 +76,8 @@ launch_user_authentication(URL) ->
 
 await_user(Port) ->
     receive
-	{'EXIT', Port, _} -> ok;
-	_ -> await_user(Port)
+		{'EXIT', Port, _} -> ok;
+		_ -> await_user(Port)
     end.
 
 ask_for_pincode(#skr_auth_reqtoken{}=RT) ->
