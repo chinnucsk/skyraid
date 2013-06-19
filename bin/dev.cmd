@@ -6,13 +6,9 @@
 @set quiet=NO
 @set root=%CD%\..
 
-:ctags
-@set tagpath;
-@for /D %%a in (../apps/*) do set tagpath=!tagpath! -pa %root%\apps\%%a\ebin
-@for /D %%a in (../deps/*) do set tagpath=!tagpath! -pa %root%\deps\%%a\ebin
-@echo %tagpath% 
+@set libpath
+@for /D %%a in (../apps/*) do set libpath=!libpath! -pa %root%\apps\%%a\ebin
+@for /D %%a in (../deps/*) do set libpath=!libpath! -pa %root%\deps\%%a\ebin
+@echo %libpath%
 
-werl %tagpath% -smp -s reloader -s skyraid
-
-
-PAUSE
+werl %libpath% -smp -s reloader -s skyraid
