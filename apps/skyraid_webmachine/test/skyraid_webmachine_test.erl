@@ -76,7 +76,7 @@ get_account_normal() ->
 	{200, [{<<"status">>,<<"ok">>}, {<<"accounts">>, _Accounts }]} = rest_req("http://localhost:8000/api/account/0/0").
 
 get_file_normal() ->
-	{200, "here comes the file"} = rest_req(text, "http://localhost:8000/api/file/myfile.txt").
+	{200, "here comes the file"} = rest_req(text, "http://localhost:8000/api/file/my.txt").
 
 put_file_normal() ->
 	Login = "{\"username\":\"Adam\", \"password\": \"test\"}",
