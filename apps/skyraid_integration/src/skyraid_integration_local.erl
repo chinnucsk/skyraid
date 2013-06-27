@@ -3,10 +3,10 @@
 -include_lib("../../skyraid/include/skyraid.hrl").
 
 -behaviour(skyraid_account_provider).
--export([init/0, create_token/0, authenticate/1, logout/1, account_info/1]).
+-export([init/0, create_token/0, authenticate/1, logout/1, account_info/1, account_info/2]).
 
 -behaviour(skyraid_file_provider).
--export([list_files/1, write_file/3, read_file/2]).
+-export([open/3, close/2, read/2, write/3, list_files/1, write_file/4, read_file/3]).
 
 %% ====================================================================
 %% API account provider
@@ -33,20 +33,35 @@ authenticate(#skr_auth_basic{username=Username, password=Password, provider=loca
 logout(_Session) ->
 	ok.
 
+account_info(_, _) ->
+	{error, not_implemented}.
+
 account_info(#skr_auth_acctoken{token= {_UserId, _AccountId}, provider=local}) ->
 	{error, not_implemented}.
 
 %% ====================================================================
 %% API file provider
 %% ====================================================================
+open(_,_,_) ->
+	{error, not_implemented}.
+
+close(_,_) ->
+	{error, not_implemented}.
+
+read(_, _) ->
+	{error, not_implemented}.
+
+write(_, _, _) ->
+	{error, not_implemented}.
+
 list_files(_Session) ->
 	{error, not_implemented}.
 
-write_file(Session, FileName, Content) ->
+write_file(Session, FileName, Content, _) ->
 	FilePath = file(Session, FileName),
 	file:write_file(FilePath, Content).
 
-read_file(Session, FileName) ->
+read_file(Session, FileName, _) ->
 	{ok, S} = skyraid_user_session:info(Session),
 	Path = "data/test/" ++ binary_to_list(S#skr_session_info.user#skr_user.username) ++ "/",
 	FilePath = filename:join(Path, FileName),

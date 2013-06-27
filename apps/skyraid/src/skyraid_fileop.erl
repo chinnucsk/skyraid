@@ -26,9 +26,9 @@ start_link(FileName, Opts) ->
 %% State
 %% ====================================================================
 -record(state, {
-	  file :: string(),
-	  opts
-	 }).
+    file :: string(),
+    opts
+}).
 
 %% ====================================================================
 %% Behavioural functions

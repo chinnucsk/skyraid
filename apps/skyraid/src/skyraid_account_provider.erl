@@ -5,6 +5,7 @@
 -type basic() :: skr_auth_basic().
 -type token() :: skr_auth_reqtoken().
 -type session() :: skr_auth_acctoken().
+-type account_id() :: term().
  
 
 -callback init() -> {ok, term()} | {error, term()}.
@@ -12,3 +13,4 @@
 -callback authenticate(basic() | token()) -> {ok, session()}| {error, term()}.
 -callback logout(session()) -> ok | {error, term()}.
 -callback account_info(session()) -> {ok, skr_account()} | {error, term()}.
+-callback account_info(session(), account_id()) -> {ok, skr_account()} | {error, term()}.

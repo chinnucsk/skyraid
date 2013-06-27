@@ -15,10 +15,13 @@
 %% ====================================================================
 %% API functions
 %% ====================================================================
--export([start_link/1, info/1, add_account/2, get_authentication/2]).
+-export([start_link/1, stop/1, info/1, add_account/2, add_accounts/2, get_account/2, get_authentication/2]).
 
 start_link(User) ->
 	gen_server:start_link(?MODULE, [User], []).
+
+stop(SessionRef) when is_pid(SessionRef) ->
+    gen_server:call(SessionRef, stop).
 
 info(SessionRef) when is_pid(SessionRef) ->
 	gen_server:call(SessionRef, get_info).
@@ -26,8 +29,14 @@ info(SessionRef) when is_pid(SessionRef) ->
 add_account(SessionRef, #skr_account{}=A) ->
     gen_server:call(SessionRef, {add_account, A}).
 
-get_authentication(SessionRef, Storage) ->
-    gen_server:call(SessionRef, {get_authentication, Storage}).
+add_accounts(SessionRef, [Accounts]) ->
+    gen_server:call(SessionRef, {add_accounts, [Accounts]}).
+
+get_account(SessionRef, AccountID) ->
+    gen_server:call(SessionRef, {get_account, AccountID}).
+
+get_authentication(SessionRef, AccountID) ->
+    gen_server:call(SessionRef, {get_authentication, AccountID}).
 
 %% ====================================================================
 %% State
@@ -45,31 +54,40 @@ get_authentication(SessionRef, Storage) ->
 
 init([#skr_user{id=UserId}=User]) ->
     {ok, Accounts} = skyraid_account_repo:get_accounts(UserId),
-    ?DEBUG({Accounts, UserId}),
     {ok, #state{user=User, accounts=Accounts}}.
 
 handle_call(get_info, _From, S) ->
     Info = create_session_info(S),
     {reply, {ok, Info}, S};
 
-handle_call({add_account, NewAccount},
-	    _From,
-	    #state{accounts=CurrentAccounts}=S) ->
+handle_call({add_account, NewAccount = #skr_account{}}, _From, #state{accounts=CurrentAccounts}=S) ->
     %% TODO add check for already existing or?
     NewState = S#state{accounts=CurrentAccounts ++ [NewAccount]},
     Info = create_session_info(NewState),
     {reply, {ok, Info}, NewState};
 
-handle_call({get_authentication, Storage},
-	    _From, #state{user=#skr_user{accounts=Accounts}}=S) ->
-    Replay = case [Auth || #skr_account{storage_id=AS,
-					authentication=Auth} <-
-			       Accounts, Storage == AS] of
-		 [Auth] -> {ok, Auth};
-		 [] -> {error, not_found}
-	     end,
+handle_call({add_accounts, [NewAccounts]}, _From, #state{accounts=CurrentAccounts}=S) ->
+    %% TODO add check for already existing or?
+    NewState = S#state{accounts=CurrentAccounts ++ [NewAccounts]},
+    Info = create_session_info(NewState),
+    {reply, {ok, Info}, NewState};
 
+handle_call({get_account, AccountID}, _From, #state{accounts=Accounts}=S) ->
+    Replay = case [A || #skr_account{id=ID}=A <- Accounts, AccountID == ID] of
+              [A] -> {ok, A};
+              [] -> {error, account_not_found}
+           end,
     {reply, Replay, S};
+
+handle_call({get_authentication, AccountID}, _From, #state{accounts=Accounts}=S) ->
+    Replay = case [Auth || #skr_account{id=ID, authentication=Auth} <- Accounts, AccountID == ID] of
+		      [Auth] -> {ok, Auth};
+		      [] -> {error, account_not_found}
+	       end,
+    {reply, Replay, S};
+
+handle_call(stop, _From, State) ->
+    {stop, normal, ok, State};
 
 handle_call(_Request, _From, State) ->
     Reply = ok,
@@ -97,3 +115,40 @@ create_session_info(#state{timestamp=TimeStamp,
     #skr_session_info{timestamp=TimeStamp,
 		      user=User,
 		      accounts=Accounts}.
+
+%% ====================================================================
+%% Unit tests
+%% ====================================================================
+-ifdef(TEST).
+-include_lib("eunit/include/eunit.hrl").
+
+skyraid_user_session_test_() ->
+    {setup, fun setup/0, fun teardown/1, 
+        fun(SessionRef) ->
+            [ 
+                get_authentication_tc(SessionRef),
+                get_account_tc(SessionRef)
+            ]
+        end
+    }.
+
+setup() ->
+    skyraid_db_ets:init(), 
+    {ok, User} = skyraid_user_repo:get_user(<<"Adam">>),
+    {ok, Pid} = skyraid_user_session:start_link(User),
+    Pid.
+
+teardown(Pid) ->
+    skyraid_db_ets:close(), 
+    ok = skyraid_user_session:stop(Pid).
+
+get_authentication_tc(Pid) ->
+    {ok, Auth} = skyraid_user_session:get_authentication(Pid, {"0", "0"}),
+    ?_assert(is_record(Auth, skr_auth_basic)).
+
+get_account_tc(Pid) ->
+    AccountID = {"0", "0"},
+    {ok, #skr_account{id=ID}} = skyraid_user_session:get_account(Pid, AccountID),
+    ?_assertEqual(AccountID, ID).
+
+-endif.

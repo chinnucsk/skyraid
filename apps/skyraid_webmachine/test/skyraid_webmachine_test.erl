@@ -45,7 +45,7 @@ login_no_accounts() ->
 	{200,[{<<"status">>,<<"ok">>},
 		  {<<"sessionId">>,_},
           {<<"user">>,{struct,[{<<"displayName">>,<<"EvaDisplay">>},{<<"email">>,<<"adam@gmail.com">>}]}},
-          {<<"accounts">>,[]}]} = rest_req(post, "http://localhost:8000/api/login", Login).
+          {<<"accounts">>,{struct, _Accounts}}]} = rest_req(post, "http://localhost:8000/api/login", Login).
 
 login_invalid_password() ->
 	Login = "{\"username\":\"Adam\", \"password\": \"WrongPassword\"}",
@@ -84,7 +84,7 @@ put_file_normal() ->
 	?DEBUG({session, SessionId}),
 	Bin = "Here comes the sun",
 	Header = [{"Authorization", binary_to_list(SessionId)}],
-	{200, Bin} = rest_req(put, "http://localhost:8000/api/file/myfile.txt", Header, "text/plain", Bin).
+	{200, Bin} = rest_req(put, "http://localhost:8000/api/file/my.txt", Header, "text/plain", Bin).
 
 rest_req(URL) ->
 	rest_req(json, URL).

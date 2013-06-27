@@ -58,7 +58,7 @@ accounts_to_proplist(_Any) ->
 	[].
 
 account_to_proplist(#skr_account{id={UserId, Id}, display_name=DisplayName, provider=StorageId}) ->
-	[{id, list_to_binary(UserId ++ "." ++ Id)}, {name, list_to_binary(DisplayName)}, {provider, StorageId}].
+	[{id, list_to_binary(UserId ++ "." ++ Id)}, {name, DisplayName}, {provider, StorageId}].
 
 
 %% ====================================================================
@@ -78,7 +78,7 @@ to_json_normal_test() ->
 	AdamAccount1 = #skr_account {
 						id={"0", "0"},
 						user_id="0",
-						display_name="AdamAccount1",
+						display_name= <<"AdamAccount1">>,
 						provider=ftp,
 						authentication = #skr_auth_basic {
 							url="ftp://myftp",

@@ -42,7 +42,6 @@ login_normal() ->
 	{ok, I} = skyraid_user_session:info(Session),
 	?assertEqual(I#skr_session_info.user#skr_user.username, <<"Adam">>).
 
-
 login_invalid_password() ->
 	?assertEqual({error, invalid_password}, skyraid:login(<<"Adam">>, "sdfdsfdsf")).
 
@@ -70,23 +69,27 @@ get_session_not_found() ->
 
 write_chunked_normal() ->
 	{ok, Session} = skyraid:login(<<"Adam">>, <<"test">>),
-	{ok, FileRef} = skyraid:file_open(Session, "Chunked.txt", [{storage, [local]}]),
-	skyraid:file_write(FileRef, <<"Rad1\n">>),
-	skyraid:file_write(FileRef, <<"Rad2\n">>),
-	skyraid:file_write(FileRef, <<"Rad3\n">>),
-	skyraid:file_close(FileRef),
-	{ok, <<"Rad1\nRad2\nRad3\n">>} = skyraid:file_read(Session, "Chunked.txt", [{storage, [local]}]).
+	AccountID = {"0", "0"},
+	{ok, FileRef} = skyraid:file_open(Session, AccountID, "Chunked.txt", []),
+	skyraid:file_write(Session, FileRef, <<"Rad1\n">>),
+	skyraid:file_write(Session, FileRef, <<"Rad2\n">>),
+	skyraid:file_write(Session, FileRef, <<"Rad3\n">>),
+	skyraid:file_close(Session, FileRef),
+	{ok, <<"Rad1\nRad2\nRad3\n">>} = skyraid:file_read(Session, AccountID, "Chunked.txt", []).
 
 write_file_normal() ->
 	{ok, Session} = skyraid:login(<<"Adam">>, <<"test">>),
-	?assertEqual(ok, skyraid:file_write(Session, "myfile.txt", <<"hello world">>, [{storage, [local]}])).
+	AccountID = {"0", "0"},
+	?assertEqual(ok, skyraid:file_write(Session, AccountID, "myfile.txt", <<"hello world">>, [])).
 
 read_file_normal() ->
 	{ok, Session} = skyraid:login(<<"Adam">>, <<"test">>),
-	ok = skyraid:file_write(Session, "ReadFile.txt", <<"hello world">>, [{storage, [local]}]),
-	?assertEqual({ok, <<"hello world">>}, skyraid:file_read(Session, "ReadFile.txt", [{storage, [local]}])).
+	AccountID = {"0", "0"},
+	ok = skyraid:file_write(Session, AccountID, "ReadFile.txt", <<"hello world">>, []),
+	?assertEqual({ok, <<"hello world">>}, skyraid:file_read(Session, AccountID, "ReadFile.txt", [])).
 
 file_list_normal() ->
 	ok.
-%%	{ok, Session} = skyraid:login(<<"Adam">>, <<"test">>),
-%%	{ok, _FileList} = skyraid:file_list(Session).
+	%%{ok, Session} = skyraid:login(<<"Adam">>, <<"test">>),
+	%%AccountID = {"0", "0"},
+	%%{ok, _FileList} = skyraid:file_list(Session, AccountID).

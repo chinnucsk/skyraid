@@ -13,8 +13,7 @@
 	  username :: binary(),
 	  password :: binary(),
 	  display_name :: binary(),
-	  email :: binary(),
-	  accounts = [] :: [skr_account()]
+	  email :: binary()
 	 }).
 -type skr_user() :: #skr_user{}.
 
@@ -54,6 +53,12 @@
 	 }).
 
 -type skr_storage() :: #skr_storage{}.
+
+-record(skr_file_ref, {
+	account_id :: term(), %% The account id of this file
+	ref :: term() %% The ref id of the file at the account
+}).
+-type skr_file_ref() :: #skr_file_ref{}.
 
 -record(skr_file_info, {
 	  size :: number(),

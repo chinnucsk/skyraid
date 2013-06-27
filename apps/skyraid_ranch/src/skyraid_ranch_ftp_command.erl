@@ -292,7 +292,7 @@ put_chunked_normal_tc() ->
 	ok = ftp:send_chunk_end(Pid).
 
 get_normal_tc() ->
-	{ok, _} = file:copy("../test/data/chunked.txt", "data/test/Adam/get.txt"),
+	{ok, _} = file:copy("../test/data/chunked.txt", "data/test/User/get.txt"),
 	{ok, Pid} = inets:start(ftpc, [{host, ?IP}, {port, ?PORT_CMD}]),
 	ok = ftp:user(Pid, <<"Adam">>, <<"test">>),
 	{ok, <<"1\r\n2\r\n3\r\n4\r\n5\r\n6\r\n7\r\n8\r\n9\r\n10">>} = ftp:recv_bin(Pid, <<"get.txt">>).

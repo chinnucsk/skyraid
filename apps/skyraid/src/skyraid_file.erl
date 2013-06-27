@@ -1,61 +1,46 @@
 -module(skyraid_file).
 
+-include_lib("skyraid.hrl").
+
 %% ====================================================================
 %% API functions
 %% ====================================================================
--export([open/3, close/1, write/2, write_file/4, read/1, read_file/3]).
+-export([open/4, close/2, write/3, read/2, write_file/5, read_file/4, list_files/2]).
 
-open(Session, FileName, Opts) ->
-    Storage = get_storage(Opts),
-    {ok, Ref} =
-	skyraid_storage:file_open(Storage, Session, FileName, Opts),
-    {ok, {Storage, Ref}}.
-
-close(_FileRef={Storage, Ref}) ->
-    skyraid_storage:file_close(Storage, Ref).
-
-write(_FileRef={Storage, Ref}, Content) ->
-    skyraid_storage:file_write(Storage, Ref, Content).
-
-write_file(Session, FileName, Content, Opts) ->
-    StorageList = get_storages(Opts),
-    Result =
-	[{skyraid_storage:write_file(S,
-				     Session,
-				     FileName,
-				     Content,
-				     Opts),
-	  S} || S<-StorageList],
-    validate(Result).
-
-read(_FileRef={Storage, Ref}) ->
-    skyraid_storage:file_read(Storage, Ref).
-
-read_file(Session, FileName, Opts) ->
-    Storage = get_storage(Opts),
-    skyraid_storage:read_file(Storage, Session, FileName, Opts).
-
-%%list(Session, Storage) ->
-%%	skyraid_storage:file_list(Storage, Session).
-
-%% ====================================================================
-%% Internal functions
-%% ====================================================================
-get_storages(Opts) ->
-    case [X || {storage, [X]} <- Opts] of
-	[S]-> [S];
-	[] -> {error, no_storage_list}
+open(Session, AccountID, FileName, Opts) ->
+    {ok, #skr_account{provider=Provider, authentication=Auth}} = skyraid_user_session:get_account(Session, AccountID),
+    {ok, ProviderModule} = skyraid_context:get_file_provider(Provider),
+    case ProviderModule:open(Auth, FileName, Opts) of
+        {ok, FileRef} -> {ok, #skr_file_ref{account_id=AccountID, ref=FileRef}};
+        {error, Reason} -> {error, Reason}
     end.
 
-get_storage(Opts) ->
-    case get_storages(Opts) of
-	[S] -> S;
-	Any -> Any
-    end.
+close(Session, #skr_file_ref{account_id=AccountID} = FR) ->
+    {ok, #skr_account{provider=Provider, authentication=Auth}} = skyraid_user_session:get_account(Session, AccountID),
+    {ok, ProviderModule} = skyraid_context:get_file_provider(Provider),
+    ProviderModule:close(Auth, FR).
 
-validate(Result)->
-    %% Enumerate result and store all errors, if empty all is fine.
-    case [{R, S} || {R, S} <- Result, R /= ok] of
-	[] -> ok;
-	Errors -> {error, Errors}
-    end.
+write(Session, #skr_file_ref{account_id=AccountID} = FR, Content) ->
+    {ok, #skr_account{provider=Provider, authentication=Auth}} = skyraid_user_session:get_account(Session, AccountID),
+    {ok, ProviderModule} = skyraid_context:get_file_provider(Provider),
+    ProviderModule:write(Auth, FR, Content).
+
+read(Session, #skr_file_ref{account_id=AccountID} = FR) ->
+    {ok, #skr_account{provider=Provider, authentication=Auth}} = skyraid_user_session:get_account(Session, AccountID),
+    {ok, ProviderModule} = skyraid_context:get_file_provider(Provider),
+    ProviderModule:read(Auth, FR).
+
+write_file(Session, AccountID, FileName, Content, Opts) ->
+    {ok, #skr_account{provider=Provider, authentication=Auth}} = skyraid_user_session:get_account(Session, AccountID),
+    {ok, ProviderModule} = skyraid_context:get_file_provider(Provider),
+    ProviderModule:write_file(Auth, FileName, Content, Opts).
+
+read_file(Session, AccountID, FileName, Opts) ->
+    {ok, #skr_account{provider=Provider, authentication=Auth}} = skyraid_user_session:get_account(Session, AccountID),
+    {ok, ProviderModule} = skyraid_context:get_file_provider(Provider),
+    ProviderModule:read_file(Auth, FileName, Opts).
+
+list_files(Session, AccountID) ->
+    {ok, #skr_account{provider=Provider, authentication=Auth}} = skyraid_user_session:get_account(Session, AccountID),
+    {ok, ProviderModule} = skyraid_context:get_file_provider(Provider),
+    ProviderModule:list_files(Auth).

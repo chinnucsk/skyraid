@@ -45,7 +45,8 @@ put_file(Session, FileName, S) ->
 		{ok, #state{data_socket=DataSocket}} ->
 			{ok , Bin} = do_recv(DataSocket, []),
 			do_close(DataSocket),
-			skyraid:file_write(Session, BaseName, Bin, [{storage, [local]}]),
+			AccountID = {"0","0"},
+			skyraid:file_write(Session, AccountID, BaseName, Bin, []),
 			{ok, S};
 		Any -> Any
 	end.
@@ -55,7 +56,9 @@ get_file(Session, FileName, S) ->
 	?DEBUG(BaseName),
 	case connect(S) of 
 		{ok, #state{data_socket=DataSocket} = NewState} ->
-			case skyraid:file_read(Session, BaseName, [{storage, [local]}]) of
+			%% TODO fetch account id from file path
+			AccountID = {"0","0"},
+			case skyraid:file_read(Session, AccountID, BaseName, []) of
 				{ok, Bin} -> 
 					case do_send(DataSocket, Bin, NewState) of 
 						ok ->

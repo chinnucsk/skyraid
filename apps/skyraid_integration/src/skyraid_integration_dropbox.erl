@@ -7,10 +7,10 @@
 -define(auth_url, "https://www.dropbox.com/1/oauth/authorize?oauth_token=").
 
 -behaviour(skyraid_account_provider).
--export([init/0, create_token/0, authenticate/1, logout/1, account_info/1]).
+-export([init/0, create_token/0, authenticate/1, logout/1, account_info/1, account_info/2]).
 
 -behaviour(skyraid_file_provider).
--export([list_files/1, write_file/3, read_file/2]).
+-export([open/3, close/2, read/2, write/3, list_files/1, read_file/3, write_file/4]).
 
 %% ====================================================================
 %% API account provider functions
@@ -30,6 +30,9 @@ authenticate(#skr_auth_reqtoken{provider=dropbox, token=[{"oauth_token_secret", 
 logout(_Session) ->
 	ok.
 
+account_info(_, _) ->
+	{error, not_implemented}.
+
 account_info(#skr_auth_acctoken{provider=dropbox, token=[{"oauth_token_secret", TokenSecret}, {"oauth_token", Token}, {"uid", _Uid}]}=AT) ->
 	Response = account_info(?key, ?secret, Token, TokenSecret),
 	Resp = mochijson2:decode(Response),
@@ -38,16 +41,27 @@ account_info(#skr_auth_acctoken{provider=dropbox, token=[{"oauth_token_secret", 
 %% ====================================================================
 %% API files provider functions
 %% ====================================================================
+open(_,_,_) ->
+	{error, not_implemented}.
+
+close(_,_) ->
+	{error, not_implemented}.
+
+read(_, _) ->
+	{error, not_implemented}.
+
+write(_, _, _) ->
+	{error, not_implemented}.
 
 list_files(#skr_auth_acctoken{provider=dropbox, token=[{"oauth_token_secret", TokenSecret}, {"oauth_token", Token}, {"uid", _Uid}]}) ->
 	Response = metadata(?key, ?secret, Token, TokenSecret, "dropbox", ""),
 	Resp = mochijson2:decode(Response),
 	{ok, to_files(Resp)}.
 
-write_file(#skr_auth_acctoken{provider=dropbox, token=[{"oauth_token_secret", TokenSecret}, {"oauth_token", Token}, {"uid", _Uid}]}, FileName, Content) ->
+write_file(#skr_auth_acctoken{provider=dropbox, token=[{"oauth_token_secret", TokenSecret}, {"oauth_token", Token}, {"uid", _Uid}]}, FileName, Content, []) ->
 	file_put(?key, ?secret, Token, TokenSecret, "dropbox", FileName, Content).
 
-read_file(#skr_auth_acctoken{provider=dropbox, token=[{"oauth_token_secret", TokenSecret}, {"oauth_token", Token}, {"uid", _Uid}]}, FileName) ->
+read_file(#skr_auth_acctoken{provider=dropbox, token=[{"oauth_token_secret", TokenSecret}, {"oauth_token", Token}, {"uid", _Uid}]}, FileName, []) ->
 	file_get(?key, ?secret, Token, TokenSecret, "dropbox", FileName).
 
 %% ====================================================================
