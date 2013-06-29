@@ -2,24 +2,23 @@
 -include("skyraid.hrl").
 
 -export([
-	 start/0, stop/0,
-	 register/1,
-     create_token/1,
-	 authenticate/1,
-	 login/2,
-	 login/1,
-	 logout/1,
-	 get_session/1,
-     add_account/2,
-	 add_account/3,
-	 file_list/2,
-	 file_open/4,
-	 file_close/2,
-	 file_write/3,
-	 file_write/4,
-	 file_write/5,
-     file_read/2,
-	 file_read/4
+    start/0, stop/0,
+	register/1,
+    create_token/1,
+	authenticate/1,
+	login/2,
+	login/1,
+	logout/1,
+	get_session/1,
+    add_account/2,
+	add_account/3,
+	file_list/2,
+	file_open/4,
+	file_close/2,
+	file_write/3,
+	file_write/5,
+    file_read/2,
+	file_read/4
 ]).
 
 %% ===================================================================
@@ -89,7 +88,7 @@ add_account(SessionRef, #skr_account{}=A) ->
     skyraid_user_session:add_account(SessionRef, LocalAccount).
 
 file_list(SessionRef, AccountID) ->
-    skyraid_file:list_files(SessionRef, AccountID).
+    skyraid_file:list(SessionRef, AccountID).
 
 -spec file_open(session_ref(), term(), string(), list()) -> {ok, file_ref()}.
 file_open(SessionRef, AccountID, FileName, Opts) ->
@@ -103,23 +102,23 @@ file_close(SessionRef, FileRef) ->
 file_write(SessionRef, FileRef, Content) ->
     skyraid_file:write(SessionRef, FileRef, Content).
 
--spec file_write(session_ref(), string(), binary(), list()) ->
-			ok | {error, term()}.
-file_write(SessionRef, FileName, Content, Opts) ->
-    skyraid_file:write_file(SessionRef, FileName, Content, Opts).
-
--spec file_write(session_ref(), atom(), string(), binary(), list()) ->
-			ok | {error, term()}.
-file_write(SessionRef, AccountID, FileName, Content, Opts) ->
-    skyraid_file:write_file(SessionRef, AccountID, FileName, Content, Opts).
-
 -spec file_read(session_ref(), file_ref()) -> {ok, binary()} | {error, term()}.
 file_read(SessionRef, FileRef) ->
     skyraid_file:read(SessionRef, FileRef).
 
+%%-spec file_write(session_ref(), string(), binary(), list()) ->
+%%			ok | {error, term()}.
+%%file_write(SessionRef, FileName, Content, Opts) ->
+%%    skyraid_file:write_file(SessionRef, FileName, Content, Opts).
+
+-spec file_write(session_ref(), atom(), string(), binary(), list()) ->
+			ok | {error, term()}.
+file_write(SessionRef, AccountID, FileName, Content, Opts) ->
+    skyraid_file:put(SessionRef, AccountID, FileName, Content, Opts).
+
 -spec file_read(session_ref(), string(), string(), list()) -> {ok, binary()} | {error, term()}.
 file_read(SessionRef, AccountID, FileName, Opts) ->
-    skyraid_file:read_file(SessionRef, AccountID, FileName, Opts).
+    skyraid_file:get(SessionRef, AccountID, FileName, Opts).
 
 %% ====================================================================
 %% Internal functions

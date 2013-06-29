@@ -10,7 +10,7 @@
 -export([init/0, create_token/0, authenticate/1, logout/1, account_info/1, account_info/2]).
 
 -behaviour(skyraid_file_provider).
--export([open/3, close/2, read/2, write/3, list_files/1, read_file/3, write_file/4]).
+-export([open/3, close/2, read/2, write/3, put/4, get/3, list/1]).
 
 %% ====================================================================
 %% API account provider functions
@@ -53,18 +53,17 @@ read(_, _) ->
 write(_, _, _) ->
 	{error, not_implemented}.
 
-list_files(#skr_auth_acctoken{provider=dropbox, token=[{"oauth_token_secret", TokenSecret}, {"oauth_token", Token}, {"uid", _Uid}]}) ->
+put(#skr_auth_acctoken{provider=dropbox, token=[{"oauth_token_secret", TokenSecret}, {"oauth_token", Token}, {"uid", _Uid}]}, FileName, Content, []) ->
+	file_put(?key, ?secret, Token, TokenSecret, "dropbox", FileName, Content).
+
+get(#skr_auth_acctoken{provider=dropbox, token=[{"oauth_token_secret", TokenSecret}, {"oauth_token", Token}, {"uid", _Uid}]}, FileName, []) ->
+	file_get(?key, ?secret, Token, TokenSecret, "dropbox", FileName).
+
+list(#skr_auth_acctoken{provider=dropbox, token=[{"oauth_token_secret", TokenSecret}, {"oauth_token", Token}, {"uid", _Uid}]}) ->
 	Response = metadata(?key, ?secret, Token, TokenSecret, "dropbox", ""),
 	Resp = mochijson2:decode(Response),
 	?INFO(Resp),
 	{ok, to_files(Resp)}.
-
-write_file(#skr_auth_acctoken{provider=dropbox, token=[{"oauth_token_secret", TokenSecret}, {"oauth_token", Token}, {"uid", _Uid}]}, FileName, Content, []) ->
-	file_put(?key, ?secret, Token, TokenSecret, "dropbox", FileName, Content).
-
-read_file(#skr_auth_acctoken{provider=dropbox, token=[{"oauth_token_secret", TokenSecret}, {"oauth_token", Token}, {"uid", _Uid}]}, FileName, []) ->
-	file_get(?key, ?secret, Token, TokenSecret, "dropbox", FileName).
-
 %% ====================================================================
 %% Internal functions
 %% ====================================================================

@@ -5,7 +5,7 @@
 %% ====================================================================
 %% API functions
 %% ====================================================================
--export([open/4, close/2, write/3, read/2, write_file/5, read_file/4, list_files/2]).
+-export([open/4, close/2, write/3, read/2, put/5, get/4, list/2]).
 
 open(Session, AccountID, FileName, Opts) ->
     {ok, #skr_account{provider=Provider, authentication=Auth}} = skyraid_user_session:get_account(Session, AccountID),
@@ -30,17 +30,17 @@ read(Session, #skr_file_ref{account_id=AccountID} = FR) ->
     {ok, ProviderModule} = skyraid_context:get_file_provider(Provider),
     ProviderModule:read(Auth, FR).
 
-write_file(Session, AccountID, FileName, Content, Opts) ->
+put(Session, AccountID, FileName, Content, Opts) ->
     {ok, #skr_account{provider=Provider, authentication=Auth}} = skyraid_user_session:get_account(Session, AccountID),
     {ok, ProviderModule} = skyraid_context:get_file_provider(Provider),
-    ProviderModule:write_file(Auth, FileName, Content, Opts).
+    ProviderModule:put(Auth, FileName, Content, Opts).
 
-read_file(Session, AccountID, FileName, Opts) ->
+get(Session, AccountID, FileName, Opts) ->
     {ok, #skr_account{provider=Provider, authentication=Auth}} = skyraid_user_session:get_account(Session, AccountID),
     {ok, ProviderModule} = skyraid_context:get_file_provider(Provider),
-    ProviderModule:read_file(Auth, FileName, Opts).
+    ProviderModule:get(Auth, FileName, Opts).
 
-list_files(Session, AccountID) ->
+list(Session, AccountID) ->
     {ok, #skr_account{provider=Provider, authentication=Auth}} = skyraid_user_session:get_account(Session, AccountID),
     {ok, ProviderModule} = skyraid_context:get_file_provider(Provider),
-    ProviderModule:list_files(Auth).
+    ProviderModule:list(Auth).
