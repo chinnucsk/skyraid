@@ -20,7 +20,8 @@ all_test_() ->
 			?T(write_chunked_normal),
 			?T(write_file_normal),
 			?T(read_file_normal),
-			?T(file_list_normal)
+			?T(file_list_normal),
+			?T(add_account_normal)
 		] 
 	}.
 
@@ -62,11 +63,6 @@ get_session_not_found() ->
 	Session = list_to_pid("<0.1.1>"),
 	{error, session_not_found} = skyraid:get_session(Session).
 
-%%add_account() ->
-%%	{ok, Session} = skyraid:login(<<"Adam">>, <<"test">>),
-%%	{ok, #skr_auth_reqtoken{token=Token}} = skyraid:authenticate(dropbox),
-%%	{ok, Session} = skyraid:add_account(Session, Token).
-
 write_chunked_normal() ->
 	{ok, Session} = skyraid:login(<<"Adam">>, <<"test">>),
 	AccountID = {"0", "0"},
@@ -93,3 +89,9 @@ file_list_normal() ->
 	%%{ok, Session} = skyraid:login(<<"Adam">>, <<"test">>),
 	%%AccountID = {"0", "0"},
 	%%{ok, _FileList} = skyraid:file_list(Session, AccountID).
+
+add_account_normal() ->
+	{ok, Session} = skyraid:login(<<"Adam">>, <<"test">>),
+	{ok, Token} = skyraid:create_token(local),
+	AccountName = <<"NewAccount">>,
+	{ok, #skr_session_info{accounts=[#skr_account{display_name=AccountName} | _Rest]}} = skyraid:add_account(Session, AccountName, Token).

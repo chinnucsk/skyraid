@@ -10,6 +10,9 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
+	skyraid_context:register_account_provider(dropbox, skyraid_integration_dropbox),
+	skyraid_context:register_file_provider(dropbox, skyraid_integration_dropbox),
+
     skyraid_integration_sup:start_link().
 
 stop(_State) ->

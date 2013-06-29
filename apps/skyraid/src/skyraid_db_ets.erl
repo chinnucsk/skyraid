@@ -26,7 +26,6 @@ init() ->
     ok.
 
 close() ->
-	?DEBUG(ets:all()),
     ets:delete(users),
     ets:delete(accounts),
     ets:delete(storages).

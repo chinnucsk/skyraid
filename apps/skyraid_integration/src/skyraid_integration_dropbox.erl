@@ -2,7 +2,7 @@
 
 -include_lib("../../skyraid/include/skyraid.hrl").
 
--define(key, "6b8S6hN6SK2YvYySTfpVg").
+-define(key, "99s6c0nh6oeez3m").
 -define(secret, "obv1gjb2aoq1zg6").
 -define(auth_url, "https://www.dropbox.com/1/oauth/authorize?oauth_token=").
 
@@ -56,6 +56,7 @@ write(_, _, _) ->
 list_files(#skr_auth_acctoken{provider=dropbox, token=[{"oauth_token_secret", TokenSecret}, {"oauth_token", Token}, {"uid", _Uid}]}) ->
 	Response = metadata(?key, ?secret, Token, TokenSecret, "dropbox", ""),
 	Resp = mochijson2:decode(Response),
+	?INFO(Resp),
 	{ok, to_files(Resp)}.
 
 write_file(#skr_auth_acctoken{provider=dropbox, token=[{"oauth_token_secret", TokenSecret}, {"oauth_token", Token}, {"uid", _Uid}]}, FileName, Content, []) ->
@@ -71,8 +72,8 @@ read_file(#skr_auth_acctoken{provider=dropbox, token=[{"oauth_token_secret", Tok
 request_token() ->
 	request_token(?key, ?secret).
 
-to_account({Account}, AccessToken) ->
-	build_account(Account, #skr_account{provider=dropbox, authentication=AccessToken}).
+to_account({struct, Props}, AccessToken) ->
+	build_account(Props, #skr_account{provider=dropbox, authentication=AccessToken}).
 
 build_account([], A) ->
 	A;
@@ -82,7 +83,7 @@ build_account([{<<"uid">>, Value} | Rest], A) ->
 	build_account(Rest, A#skr_account{id={dropbox, Value}, ext_id=Value});
 build_account([{<<"country">>, Value} | Rest], A) ->
 	build_account(Rest, A#skr_account{country=Value});
-build_account([{<<"quota_info">>, {[{<<"shared">>,Shared},{<<"quota">>,Quota},{<<"normal">>,Normal}]}} | Rest], A) ->
+build_account([{<<"quota_info">>, {struct, [{<<"shared">>,Shared},{<<"quota">>,Quota},{<<"normal">>,Normal}]}} | Rest], A) ->
 	build_account(Rest, A#skr_account{quota_info=#skr_quota_info{shared=Shared, quota=Quota, normal=Normal}});
 build_account([_Any | R], A) ->
 	build_account(R, A).
@@ -130,16 +131,8 @@ metadata(Key, Secret, Token, TokenSecret, Root, Path) ->
 -include_lib("eunit/include/eunit.hrl").
 
 to_account_test() ->
-	A = {[{<<"referral_link">>,<<"https://www.dropbox.com/referrals/NTE1NDg0Mzc1MDk">>},
-	  		{<<"display_name">>,<<"Apa Nilsson">>},
-	  		{<<"uid">>,154843750},
-	  		{<<"country">>,<<"SE">>},
-	  		{<<"quota_info">>,
-	  		{[{<<"shared">>,0},
-	    		{<<"quota">>,2147483648},
-	    		{<<"normal">>,1425347}]}},
-	    		{<<"email">>,<<"apa.nilsson@gmail.com">>}]},
+	A = {struct, [{<<"referral_link">>, <<"http://db.tt/m4Bj519C">>},{<<"display_name">>, <<"Apa Nilsson">>}, {<<"uid">>, 154843750}, {<<"country">>, <<"SE">>}, {<<"quota_info">>, {struct, [{<<"shared">>, 0}, {<<"quota">>, 2147483648}, {<<"normal">>, 1427246}]}}, {<<"email">>, <<"tandy.nilsson@gmail.com">>}]},
 	
- 	#skr_account{display_name = <<"Apa Nilsson">>} = to_account(A, #skr_account{provider=dropbox}).
+ 	#skr_account{ext_id=154843750, display_name = <<"Apa Nilsson">>} = to_account(A, #skr_auth_acctoken{provider=dropbox}).
 
  -endif.

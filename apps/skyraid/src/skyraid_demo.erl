@@ -4,13 +4,13 @@
 -export([run/0, run/2]).
 
 run() ->
-    skyraid:register(#skr_user{username = <<"Test">>,
-			       password = <<"test">>}),
+    skyraid:register(#skr_user{username = <<"Test">>,password = <<"test">>}),
     {ok, SessionRef} = skyraid:login(<<"Test">>, <<"test">>),
-    {ok, #skr_auth_reqtoken{url=URL}=RT} = skyraid:authenticate(dropbox),
+    {ok, #skr_auth_reqtoken{url=URL}=RT} = skyraid:create_token(dropbox),
     launch_user_authentication(URL),
-    {ok, _} = skyraid:add_account(SessionRef, RT),
-    {ok, _Files} = skyraid:file_list(SessionRef, dropbox),
+    _RTP = ask_for_pincode(RT),
+    {ok, #skr_session_info{accounts=[#skr_account{id=AccountID}|_Rest]}} = skyraid:add_account(SessionRef, <<"NewAccount">>, RT),
+    {ok, _Files} = skyraid:file_list(SessionRef, AccountID),
     {ok, _File} = skyraid:file_read(SessionRef,
 				    dropbox,
 				    "master_slave.erl",
@@ -24,17 +24,16 @@ run() ->
 	skyraid:add_account(SessionRef,
 			    #skr_account{
 			       storage_id=ftp,
-			       authentication=
-				   #skr_auth_basic{
-				      url="ftp://myftp:8080",
-				      provider=ftp,
-				      username= <<"Testing">>,
-				      password= <<"Test">>}}),
+			       authentication=#skr_auth_basic{
+				        url="ftp://myftp:8080",
+				        provider=ftp,
+				        username= <<"Testing">>,
+				        password= <<"Test">>}}),
     {ok, _} = skyraid:file_list(SessionRef, ftp).
 
 
 run(Provider, Demo) ->
-    {ok, #skr_auth_reqtoken{url=URL} = RT} = skyraid:authenticate(Provider),
+    {ok, #skr_auth_reqtoken{url=URL} = RT} = skyraid:create_token(Provider),
     launch_user_authentication(URL),
     RTP = ask_for_pincode(RT),
     {ok, AT} = skyraid:authenticate(RTP),
@@ -46,8 +45,8 @@ run(Provider, Demo) ->
     end.
 
 account(AT) ->
-    {ok, Account} = skyraid_storage:account_info(AT),
-    Account.
+    {ok, SessionInfo} = skyraid:get_session(AT),
+    SessionInfo.
 
 files(AT) ->
     {ok, Files} = skyraid_storage:file_list(AT),

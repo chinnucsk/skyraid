@@ -13,7 +13,12 @@ init() ->
 	{ok, []}.
 
 create_token() ->
-	{error, not_supported}.
+	%% Only used for tests
+	{ok, #skr_auth_reqtoken{url="www.test.com", provider=local}}.
+
+authenticate(#skr_auth_reqtoken{provider=local}) ->
+	%% Only used for test
+	{ok, #skr_auth_acctoken{provider=local, token="0"}};
 
 authenticate(#skr_auth_basic{username=Username, password=Password, provider=local}) ->
 	case skyraid_user_repo:get_user(Username) of
@@ -31,8 +36,8 @@ authenticate(#skr_auth_basic{username=Username, password=Password, provider=loca
 logout(_Session) ->
 	ok.
 
-account_info(#skr_account{}) ->
-	{error, not_supported}.
+account_info(#skr_auth_acctoken{token=UserID}=AT) ->
+	{ok, #skr_account{id=make_ref(), user_id=UserID, provider=local, authentication=AT}}.
 
 account_info(#skr_auth_acctoken{}, {UserID, AccountID}) ->
 	skyraid_account_repo:get_account(UserID, AccountID).
@@ -61,7 +66,7 @@ teardown(_) ->
 	skyraid:stop().
 
 create_token_tc() ->
-	{error, not_supported} = create_token().
+	{ok, #skr_auth_reqtoken{}} = create_token().
 
 authenticate_tc() ->
 	Auth = #skr_auth_basic{username= <<"Adam">>, password= <<"test">>, provider=local},

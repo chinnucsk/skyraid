@@ -4,12 +4,14 @@
 -export([
 	 start/0, stop/0,
 	 register/1,
+     create_token/1,
 	 authenticate/1,
 	 login/2,
 	 login/1,
 	 logout/1,
 	 get_session/1,
-	 add_account/2,
+     add_account/2,
+	 add_account/3,
 	 file_list/2,
 	 file_open/4,
 	 file_close/2,
@@ -37,13 +39,11 @@ stop() ->
     application:stop(ssl),
     application:stop(?MODULE).
 
--spec authenticate(atom() | skr_auth_reqtoken()) ->
-			  {ok, skr_auth_reqtoken()} |
-			  {ok, skr_auth_acctoken()} |
-			  {error | term()}.
-authenticate(Provider) when is_atom(Provider)->
-    skyraid_auth:authenticate(Provider);
+-spec create_token(atom() | skr_auth_reqtoken()) -> {ok, skr_auth_reqtoken()} |{error | term()}.
+create_token(Provider) when is_atom(Provider)->
+    skyraid_auth:create_token(Provider).
 
+-spec authenticate(skr_auth_reqtoken()) -> {ok, skr_auth_acctoken()} |{error | term()}.
 authenticate(#skr_auth_reqtoken{}=RT) ->
     skyraid_auth:authenticate(RT).
 
@@ -57,8 +57,7 @@ register(#skr_auth_reqtoken{}=RT) ->
     {ok, Account} = skyraid_storage:account_info(AT),
     ok = skyraid_account_repo:new(Account).
 
--spec login(binary(), binary()) ->
-		   {ok, session_ref()} | {error, term()}.
+-spec login(binary(), binary()) ->{ok, session_ref()} | {error, term()}.
 login(Username, Password) ->
     skyraid_auth:login(Username, Password).
 
@@ -71,19 +70,18 @@ login(#skr_auth_reqtoken{}=RT) ->
 logout(SessionRef) ->
     skyraid_auth:logout(SessionRef).
 
--spec get_session(session_ref()) ->
-			 {ok, skr_session_info()} | {error, term()}.
+-spec get_session(session_ref()) -> {ok, skr_session_info()} | {error, term()}.
 get_session(SessionRef) ->
     skyraid_auth:info(SessionRef).
 
--spec add_account(session_ref(), skr_auth_reqtoken()) ->
-			 {ok, skr_session_info()} | {error, term()}.
-add_account(SessionRef, #skr_auth_reqtoken{}=RT) ->
+-spec add_account(session_ref(), skr_auth_reqtoken()) -> {ok, skr_session_info()} | {error, term()}.
+add_account(SessionRef, AccountName, #skr_auth_reqtoken{provider=Provider}=RT) ->
     {ok, AT} = skyraid_auth:authenticate(RT),
-    {ok, RemoteAccount} = skyraid_storage:account_info(AT),
+    {ok, ProviderModule} = skyraid_context:get_account_provider(Provider),
+    {ok, RemoteAccount} = ProviderModule:account_info(AT),
     {ok, #skr_session_info{user=#skr_user{id=UserID}}} = skyraid_user_session:info(SessionRef),
-    {ok, LocalAccount} = skyraid_account_repo:new(RemoteAccount#skr_account{user_id=UserID}),
-    skyraid_user_session:add_account(SessionRef, LocalAccount);
+    {ok, LocalAccount} = skyraid_account_repo:new(RemoteAccount#skr_account{user_id=UserID, display_name=AccountName}),
+    skyraid_user_session:add_account(SessionRef, LocalAccount).
 
 add_account(SessionRef, #skr_account{}=A) ->
     {ok, #skr_session_info{user=#skr_user{id=UserID}}} = skyraid_user_session:info(SessionRef),
@@ -91,7 +89,7 @@ add_account(SessionRef, #skr_account{}=A) ->
     skyraid_user_session:add_account(SessionRef, LocalAccount).
 
 file_list(SessionRef, AccountID) ->
-    skyraid_file:file_list(SessionRef, AccountID).
+    skyraid_file:list_files(SessionRef, AccountID).
 
 -spec file_open(session_ref(), term(), string(), list()) -> {ok, file_ref()}.
 file_open(SessionRef, AccountID, FileName, Opts) ->

@@ -62,19 +62,19 @@ handle_call(get_info, _From, S) ->
 
 handle_call({add_account, NewAccount = #skr_account{}}, _From, #state{accounts=CurrentAccounts}=S) ->
     %% TODO add check for already existing or?
-    NewState = S#state{accounts=CurrentAccounts ++ [NewAccount]},
+    NewState = S#state{accounts= [NewAccount] ++ CurrentAccounts},
     Info = create_session_info(NewState),
     {reply, {ok, Info}, NewState};
 
 handle_call({add_accounts, [NewAccounts]}, _From, #state{accounts=CurrentAccounts}=S) ->
     %% TODO add check for already existing or?
-    NewState = S#state{accounts=CurrentAccounts ++ [NewAccounts]},
+    NewState = S#state{accounts=[NewAccounts] ++ CurrentAccounts},
     Info = create_session_info(NewState),
     {reply, {ok, Info}, NewState};
 
 handle_call({get_account, AccountID}, _From, #state{accounts=Accounts}=S) ->
     Replay = case [A || #skr_account{id=ID}=A <- Accounts, AccountID == ID] of
-              [A] -> {ok, A};
+              [A|_Rest] -> {ok, A};
               [] -> {error, account_not_found}
            end,
     {reply, Replay, S};
@@ -127,7 +127,8 @@ skyraid_user_session_test_() ->
         fun(SessionRef) ->
             [ 
                 get_authentication_tc(SessionRef),
-                get_account_tc(SessionRef)
+                get_account_tc(SessionRef),
+                add_account_tc(SessionRef)
             ]
         end
     }.
@@ -150,5 +151,11 @@ get_account_tc(Pid) ->
     AccountID = {"0", "0"},
     {ok, #skr_account{id=ID}} = skyraid_user_session:get_account(Pid, AccountID),
     ?_assertEqual(AccountID, ID).
+
+add_account_tc(Pid) ->
+    ID = make_ref(),
+    Account = #skr_account{id=ID, user_id="0"},
+    {ok, #skr_session_info{accounts=[NewAccount|_Rest]}} = skyraid_user_session:add_account(Pid, Account),
+    ?_assertEqual(Account, NewAccount).
 
 -endif.
