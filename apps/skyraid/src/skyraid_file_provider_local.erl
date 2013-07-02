@@ -31,9 +31,7 @@ get(#skr_auth_basic{username=UserId}, FileName, _Opts) ->
 	file:read_file(FilePath).
 
 list(#skr_auth_basic{username=UserId}) ->
-    ?DEBUG("listing"),
     Root = root_dir(UserId),
-    ?DEBUG(Root),
     {ok, FileNames} = file:list_dir(Root),
     FileInfos = [fileinfo(Root, F) || F <- FileNames],
     {ok, to_fileinfos(FileInfos)}.

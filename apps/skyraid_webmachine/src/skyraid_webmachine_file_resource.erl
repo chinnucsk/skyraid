@@ -31,7 +31,7 @@ is_authorized(ReqData, Context) ->
 	end.
 
 resource_exists(ReqData, Context) ->
-	?DEBUG(decode(ReqData)),
+	_P = decode(ReqData),
 	{true, ReqData, Context}.
 
 to_text(ReqData, Context) ->
