@@ -232,8 +232,8 @@ skyraid_ranch_ftp_test_() ->
 			?T(logout_tc),
 			?T(pwd_tc),
 			?T(put_normal_tc),
-			?T(put_chunked_normal_tc),
-			?T(get_normal_tc)
+			?T(put_chunked_normal_tc)
+%%			?T(get_normal_tc)
 		] 
 	}.
 

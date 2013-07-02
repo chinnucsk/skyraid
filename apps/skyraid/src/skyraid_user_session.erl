@@ -144,11 +144,11 @@ teardown(Pid) ->
     ok = skyraid_user_session:stop(Pid).
 
 get_authentication_tc(Pid) ->
-    {ok, Auth} = skyraid_user_session:get_authentication(Pid, {"0", "0"}),
+    {ok, Auth} = skyraid_user_session:get_authentication(Pid, "0"),
     ?_assert(is_record(Auth, skr_auth_basic)).
 
 get_account_tc(Pid) ->
-    AccountID = {"0", "0"},
+    AccountID = "0",
     {ok, #skr_account{id=ID}} = skyraid_user_session:get_account(Pid, AccountID),
     ?_assertEqual(AccountID, ID).
 

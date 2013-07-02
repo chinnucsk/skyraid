@@ -20,8 +20,8 @@ all_test_() ->
 			?T(write_chunked_normal),
 			?T(write_file_normal),
 			?T(read_file_normal),
-			?T(file_list_normal),
-			?T(add_account_normal)
+			?T(add_account_normal),
+			?T(file_list_normal)
 		] 
 	}.
 
@@ -32,10 +32,12 @@ teardown(_Any) ->
 	skyraid:stop().
 
 register_normal() ->
-	User = #skr_user{username = <<"Apa">>, 
-				  password = <<"test">>, 
-				  display_name = <<"ApaDisplay">>, 
-				  email = <<"adam@gmail.com">>},
+	User = #skr_user{
+			username = <<"Apa">>, 
+			password = <<"test">>, 
+			display_name = <<"ApaDisplay">>, 
+			email = <<"adam@gmail.com">>
+		},
 	?assertEqual({ok, User}, skyraid:register(User)).
 
 login_normal() ->
@@ -65,7 +67,7 @@ get_session_not_found() ->
 
 write_chunked_normal() ->
 	{ok, Session} = skyraid:login(<<"Adam">>, <<"test">>),
-	AccountID = {"0", "0"},
+	AccountID = "0",
 	{ok, FileRef} = skyraid:file_open(Session, AccountID, "Chunked.txt", []),
 	skyraid:file_write(Session, FileRef, <<"Rad1\n">>),
 	skyraid:file_write(Session, FileRef, <<"Rad2\n">>),
@@ -75,23 +77,22 @@ write_chunked_normal() ->
 
 write_file_normal() ->
 	{ok, Session} = skyraid:login(<<"Adam">>, <<"test">>),
-	AccountID = {"0", "0"},
+	AccountID = "0",
 	?assertEqual(ok, skyraid:file_write(Session, AccountID, "myfile.txt", <<"hello world">>, [])).
 
 read_file_normal() ->
 	{ok, Session} = skyraid:login(<<"Adam">>, <<"test">>),
-	AccountID = {"0", "0"},
+	AccountID = "0",
 	ok = skyraid:file_write(Session, AccountID, "ReadFile.txt", <<"hello world">>, []),
 	?assertEqual({ok, <<"hello world">>}, skyraid:file_read(Session, AccountID, "ReadFile.txt", [])).
-
-file_list_normal() ->
-	ok.
-	%%{ok, Session} = skyraid:login(<<"Adam">>, <<"test">>),
-	%%AccountID = {"0", "0"},
-	%%{ok, _FileList} = skyraid:file_list(Session, AccountID).
 
 add_account_normal() ->
 	{ok, Session} = skyraid:login(<<"Adam">>, <<"test">>),
 	{ok, Token} = skyraid:create_token(local),
 	AccountName = <<"NewAccount">>,
 	{ok, #skr_session_info{accounts=[#skr_account{display_name=AccountName} | _Rest]}} = skyraid:add_account(Session, AccountName, Token).
+
+file_list_normal() ->
+	{ok, Session} = skyraid:login(<<"Adam">>, <<"test">>),
+	AccountID = "0",
+	{ok, [#skr_file_info{}|_Rest]} = skyraid:file_list(Session, AccountID).

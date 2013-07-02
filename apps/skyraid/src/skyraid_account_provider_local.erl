@@ -39,8 +39,8 @@ logout(_Session) ->
 account_info(#skr_auth_acctoken{token=UserID}=AT) ->
 	{ok, #skr_account{id=make_ref(), user_id=UserID, provider=local, authentication=AT}}.
 
-account_info(#skr_auth_acctoken{}, {UserID, AccountID}) ->
-	skyraid_account_repo:get_account(UserID, AccountID).
+account_info(#skr_auth_acctoken{}, AccountID) ->
+	skyraid_account_repo:get_account(AccountID).
 
 %% ====================================================================
 %% Unit Tests 
@@ -80,6 +80,6 @@ logout_tc() ->
 account_info_tc() ->
 	Auth = #skr_auth_basic{username= <<"Adam">>, password= <<"test">>, provider=local},
 	{ok, AT} = authenticate(Auth),
-	{ok, #skr_account{user_id="0"}} = account_info(AT, {"0", "0"}).
+	{ok, #skr_account{user_id="0"}} = account_info(AT, "0").
 
 -endif.

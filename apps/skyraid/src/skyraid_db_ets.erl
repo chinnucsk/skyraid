@@ -14,7 +14,7 @@
 	 get_user/1,
 	 get_user_by_id/1]).
 -export([create_account/1,
-	 get_account/2,
+	 get_account/1,
 	 get_accounts/1,
 	 get_all_accounts/0]).
 
@@ -55,8 +55,8 @@ create_user(#skr_user{} = User) ->
 	Any-> {error, Any}
     end.
 
-get_account(UserID, AccountID) ->
-    case ets:lookup(accounts, {UserID, AccountID}) of
+get_account(AccountID) ->
+    case ets:lookup(accounts, AccountID) of
 		[] -> not_found;
 		[Account] -> {ok, Account}
     end.
@@ -96,7 +96,7 @@ insert_test_data() ->
 	     email = <<"adam@gmail.com">>},
 
     AdamAccount1 = #skr_account {
-		      id={"0", "0"},
+		      id="0",
 		      user_id="0",
 		      provider=local,
 		      display_name= <<"AdamAccount1">>,
@@ -108,7 +108,7 @@ insert_test_data() ->
 		     },
 
     EvaAccount1 = #skr_account {
-		      id={"1", "0"},
+		      id="1",
 		      user_id="1",
 		      display_name= <<"EvaAccount1">>,
 		      provider=local,
@@ -148,7 +148,10 @@ get_user_tc() ->
 get_accounts_tc() ->
     {ok, [#skr_account{user_id = "0"}]} = get_accounts("0").
 
+get_account_tc() ->
+	{ok, [#skr_account{id="0"}|_]} = get_account("0").
+
 get_all_accounts_tc() ->
-    {ok, [#skr_account{user_id = "0"} | _Rest]} = get_all_accounts().
+    {ok, [#skr_account{} | _Rest]} = get_all_accounts().
 
 -endif.

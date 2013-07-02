@@ -57,8 +57,8 @@ accounts_to_proplist([Accounts]) ->
 accounts_to_proplist(_Any) ->
 	[].
 
-account_to_proplist(#skr_account{id={UserId, Id}, display_name=DisplayName, provider=StorageId}) ->
-	[{id, list_to_binary(UserId ++ "." ++ Id)}, {name, DisplayName}, {provider, StorageId}].
+account_to_proplist(#skr_account{id=Id, display_name=DisplayName, provider=StorageId}) ->
+	[{id, list_to_binary(Id)}, {name, DisplayName}, {provider, StorageId}].
 
 
 %% ====================================================================
@@ -76,7 +76,7 @@ to_json_normal_test() ->
 			email = <<"adam@gmail.com">>},
 
 	AdamAccount1 = #skr_account {
-						id={"0", "0"},
+						id="0",
 						user_id="0",
 						display_name= <<"AdamAccount1">>,
 						provider=ftp,
@@ -94,7 +94,7 @@ to_json_normal_test() ->
 	Expected = {struct,[{<<"status">>,<<"ok">>},
                    		{<<"sessionId">>,<<"g2dkAA1ub25vZGVAbm9ob3N0AAAABAAAAAEA">>},
                    		{<<"user">>,{struct,[{<<"displayName">>,<<"AdamDisplay">>},{<<"email">>,<<"adam@gmail.com">>}]}},
-                   		{<<"accounts">>,{struct,[{<<"id">>,<<"0.0">>},{<<"name">>,<<"AdamAccount1">>}, {<<"provider">>, <<"ftp">>}]}}]},
+                   		{<<"accounts">>,{struct,[{<<"id">>,<<"0">>},{<<"name">>,<<"AdamAccount1">>}, {<<"provider">>, <<"ftp">>}]}}]},
 
     JSON = to_json(SessionRef, SessionInfo),
     Expected = mochijson2:decode(JSON).

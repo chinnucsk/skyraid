@@ -1,6 +1,12 @@
 -module(skyraid_webmachine_rest).
 
--export([rest_req/1, rest_req/2, rest_req/3, rest_req/4, rest_req/5]).
+-export([get/1, get/2, rest_req/1, rest_req/2, rest_req/3, rest_req/4, rest_req/5]).
+
+get(URL) ->
+	rest_req(json, URL). 
+
+get(URL, Header) ->
+	rest_req(get, URL, Header, "application/json", "apa").
 
 rest_req(URL) ->
 	rest_req(json, URL).

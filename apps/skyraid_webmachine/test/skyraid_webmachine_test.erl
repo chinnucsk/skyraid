@@ -20,6 +20,8 @@ skyraid_webmachine_test_() ->
 			?T(get_accounts_normal),
 			?T(get_account_normal),
 			?T(get_all_accounts),
+
+			?T(list_files_normal),
 			?T(get_file_normal),
 			?T(put_file_normal)
 		] 
@@ -67,13 +69,17 @@ get_all_users() ->
 	{200, _User} = rest_req("http://localhost:8000/api/user").
 
 get_all_accounts() ->
-	{200, [{<<"status">>,<<"ok">>}, {<<"accounts">>, _Accounts }]} = rest_req("http://localhost:8000/api/account").
+	{200, [{<<"status">>,<<"ok">>}, {<<"accounts">>, _Accounts }]} = rest_req("http://localhost:8000/api/accounts").
 
 get_accounts_normal() ->
 	{200, [{<<"status">>,<<"ok">>}, {<<"accounts">>, _Accounts }]} = rest_req("http://localhost:8000/api/account/0").
 
 get_account_normal() ->
-	{200, [{<<"status">>,<<"ok">>}, {<<"accounts">>, _Accounts }]} = rest_req("http://localhost:8000/api/account/0/0").
+	{200, [{<<"status">>,<<"ok">>}, {<<"accounts">>, _Accounts }]} = rest_req("http://localhost:8000/api/user/0/account/0").
+
+list_files_normal() ->
+	ok.
+	%%rest_req("http://localhost:8000/api/user/0/account/0/file/").
 
 get_file_normal() ->
 	{200, "here comes the file"} = rest_req(text, "http://localhost:8000/api/file/my.txt").

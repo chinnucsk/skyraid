@@ -26,8 +26,8 @@ resource_exists(ReqData, Context) ->
 		[] ->
 			{ok, All} = skyraid_account_repo:get_all_accounts(),
 			{true, ReqData, All};
-		[UserId, AccountId] ->
-			case skyraid_account_repo:get_account(UserId, AccountId) of
+		[_UserId, AccountId] ->
+			case skyraid_account_repo:get_account(AccountId) of
 				{ok, Account} -> {true, ReqData, [Account]};
 				not_found -> {false, ReqData, Context}
 			end;
@@ -60,7 +60,7 @@ from_json(ReqData, Context) ->
 %% Private
 %% ====================================================================
 
-account_to_proplist(#skr_account{id={UserId, Id}, user_id=UserId, display_name=DisplayName}) ->
+account_to_proplist(#skr_account{id=Id, user_id=UserId, display_name=DisplayName}) ->
 	[{id, Id}, {userId, UserId}, {displayName, DisplayName}].
 
 proplist_to_account([{<<"userId">>, UserId}, {<<"displayName">>, DisplayName}, {<<"email">>, Email}]) ->

@@ -45,7 +45,8 @@ put_file(Session, FileName, S) ->
 		{ok, #state{data_socket=DataSocket}} ->
 			{ok , Bin} = do_recv(DataSocket, []),
 			do_close(DataSocket),
-			AccountID = {"0","0"},
+			%% TODO must change this, only temp!!
+			AccountID = "0",
 			skyraid:file_write(Session, AccountID, BaseName, Bin, []),
 			{ok, S};
 		Any -> Any
