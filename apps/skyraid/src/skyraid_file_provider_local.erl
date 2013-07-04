@@ -32,9 +32,13 @@ get(#skr_auth_basic{username=UserId}, FileName, _Opts) ->
 
 list(#skr_auth_basic{username=UserId}, Path) ->
     Dir = path(UserId, Path),
-    {ok, FileNames} = file:list_dir(Dir),
-    FileInfos = [fileinfo(Dir, F) || F <- FileNames],
-    {ok, to_fileinfos(FileInfos)}.
+    case file:list_dir(Dir) of
+        {ok, FileNames} ->
+            FileInfos = [fileinfo(Dir, F) || F <- FileNames],
+            {ok, to_fileinfos(FileInfos)};
+        {error, Reason} -> 
+            {error, Reason}
+    end.
 
 mkdir(#skr_auth_basic{username=UserId}, UserPath) ->
     Path = file(UserId, UserPath),

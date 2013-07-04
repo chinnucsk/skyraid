@@ -102,7 +102,7 @@ insert_test_data() ->
 		      display_name= <<"AdamAccount1">>,
 		      authentication = #skr_auth_basic {
 					  provider=local,
-					  username="User",
+					  username="Testing",
 					  password="test"
 					 }
 		     },

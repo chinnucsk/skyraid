@@ -92,7 +92,8 @@ skyraid_webmachine_fileinfo_resource_test_() ->
 		[
 			{"Get file from invalid session", fun list_account_invalid_session_tc/0},
 			{"Get file without session", fun list_account_without_session_tc/0},
-			{"Get a list of all files from a specified account", fun list_account_root_tc/0}
+			{"Get a list of all files from a specified accounts root", fun list_account_root_tc/0},
+			{"Get a list of files from a invalid path", fun list_account_invalid_path_tc/0}
 		]
 	}.
 
@@ -121,12 +122,12 @@ list_account_root_tc() ->
 	Header = [{"Authorization", binary_to_list(SessionId)}],
 	{200, [{struct, [{<<"path">>, _},{<<"is_dir">>,_},{<<"size">>,_}]} |_Rest]} = skyraid_webmachine_rest:get(Url, Header).
 
-list_account_specified_dir_tc() ->
+list_account_invalid_path_tc() ->
 	Login = "{\"username\":\"Adam\", \"password\": \"test\"}",
 	{200,[_,{<<"sessionId">>, SessionId}, _, _]} = skyraid_webmachine_rest:rest_req(post, "http://localhost:8000/api/login", Login),
-	Url = "http://localhost:8000/api/account/0/file_info/sub_dir/",
+	Url = "http://localhost:8000/api/account/0/file_info/invalid_path/",
 	Header = [{"Authorization", binary_to_list(SessionId)}],
-	{200, [{struct, [{<<"path">>, _},{<<"is_dir">>,_},{<<"size">>,_}]} |_Rest]} = skyraid_webmachine_rest:get(Url, Header).
+	{404, _} = skyraid_webmachine_rest:get(Url, Header).
 
 decode_session_test() ->
 	Str = "g2dkAA1ub25vZGVAbm9ob3N0AAAABAAAAAEA",

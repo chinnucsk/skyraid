@@ -109,12 +109,12 @@ code_change(_OldVsn, State, _Extra) ->
 %% Internal functions
 %% ====================================================================
 
-create_session_info(#state{timestamp=TimeStamp,
-			   user=User,
-			   accounts=Accounts}) ->
-    #skr_session_info{timestamp=TimeStamp,
-		      user=User,
-		      accounts=Accounts}.
+create_session_info(#state{timestamp=TimeStamp, user=User,accounts=Accounts}) ->
+    #skr_session_info{
+        timestamp=TimeStamp,
+        user_id=User#skr_user.id,
+        user=User,
+        accounts=Accounts}.
 
 %% ====================================================================
 %% Unit tests

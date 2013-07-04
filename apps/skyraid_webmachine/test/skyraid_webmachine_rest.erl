@@ -3,7 +3,7 @@
 -export([get/1, get/2, rest_req/1, rest_req/2, rest_req/3, rest_req/4, rest_req/5]).
 
 get(URL) ->
-	rest_req(json, URL). 
+	get(URL, []).
 
 get(URL, Header) ->
 	{ok, {{_V, ReturnCode, _R}, _H, ResponseBody}} = httpc:request(get, {URL, Header}, [],[]),

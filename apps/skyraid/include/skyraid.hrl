@@ -9,7 +9,7 @@
 
 
 -record(skr_user, {
-	id = erlang:ref_to_list(make_ref()) :: reference(),
+	id = erlang:ref_to_list(make_ref()) :: list(),
 	username :: binary(),
 	password :: binary(),
 	display_name :: binary(),
@@ -19,6 +19,7 @@
 
 -record(skr_session_info, {
 	timestamp :: term(),
+	user_id :: list(),
 	user :: skr_user(),
 	accounts = [] :: [skr_account()]
 }).

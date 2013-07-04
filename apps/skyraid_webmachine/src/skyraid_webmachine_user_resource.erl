@@ -75,10 +75,11 @@ proplist_to_user([{<<"username">>, Username}, {<<"password">>, Password}, {<<"em
 -ifdef(TEST).
 
 to_json_test() ->
-	User = #skr_user{username = <<"Apa">>,
-			  password = <<"test">>, 
-			  display_name = <<"ApaDisplay">>, 
-			  email = <<"adam@gmail.com">>},
+	User = #skr_user{
+				username = <<"Apa">>,
+			  	password = <<"test">>, 
+			  	display_name = <<"ApaDisplay">>, 
+			  	email = <<"adam@gmail.com">>},
 	
  	{Json, _, _} = to_json([], [User]),
  	{struct, [{<<"id">>, _}, {<<"username">>, <<"Apa">>}, {<<"displayName">>, <<"ApaDisplay">>}]} = mochijson2:decode(Json).
