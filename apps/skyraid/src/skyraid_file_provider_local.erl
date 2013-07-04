@@ -6,7 +6,7 @@
 -define(DATA_ROOT, "../../skyraid/.eunit/data/test/").
 
 -behaviour(skyraid_file_provider).
--export([open/3, close/2, read/2, write/3, put/4, get/3, list/1]).
+-export([open/3, close/2, read/2, write/3, put/4, get/3, list/2]).
 -export([mkdir/2, copy/3, move/3, delete/2]).
 
 open(#skr_auth_basic{username=UserId}, FileName, _Opts) ->
@@ -30,10 +30,10 @@ get(#skr_auth_basic{username=UserId}, FileName, _Opts) ->
 	FilePath = path(UserId, FileName),
 	file:read_file(FilePath).
 
-list(#skr_auth_basic{username=UserId}) ->
-    Root = root_dir(UserId),
-    {ok, FileNames} = file:list_dir(Root),
-    FileInfos = [fileinfo(Root, F) || F <- FileNames],
+list(#skr_auth_basic{username=UserId}, Path) ->
+    Dir = path(UserId, Path),
+    {ok, FileNames} = file:list_dir(Dir),
+    FileInfos = [fileinfo(Dir, F) || F <- FileNames],
     {ok, to_fileinfos(FileInfos)}.
 
 mkdir(#skr_auth_basic{username=UserId}, UserPath) ->
@@ -130,8 +130,18 @@ to_fileinfo(Path, IsDir, #file_info{size=Size, mtime=Modified}) ->
 -include_lib("eunit/include/eunit.hrl").
 
 -define(USER_ID, "Testing").
--define(ROOT, ?DATA_ROOT ++ "/" ?USER_ID ++ "/").
+-define(ROOT, ?DATA_ROOT ++ ?USER_ID ++ "/").
 -define(AUTH, #skr_auth_basic{username=?USER_ID}).
+
+setup(list) ->
+    File = "subfile.txt",
+    Dir = "a_sub_dir",
+    DirPath = ?ROOT ++ Dir,
+    FilePath = DirPath ++ "/" ++ File, 
+    file:make_dir(DirPath),
+    file:write_file(FilePath, <<"my subfile">>),
+    {Dir, File};
+
 
 setup(copy) ->
     Src = "src_copy.txt",
@@ -167,6 +177,15 @@ setup(Root, del_file) ->
     ok = filelib:ensure_dir(Root),
     ok = file:write_file(Path, <<"my file to delete">>),
     Src.
+
+list_test() ->
+    {Dir, _File} = setup(list),
+    {ok, [#skr_file_info{path="/" ++ Dir, is_dir=true} | _Rest ]} = list(?AUTH, "/").
+
+list_sub_dir_test() ->
+    {Dir, File} = setup(list),
+    Path = "/" ++ File,
+    {ok, [#skr_file_info{path=Path, is_dir=false} | _Rest ]} = list(?AUTH, Dir ++ "/").
 
 mkdir_test() ->
     UserId=?USER_ID,

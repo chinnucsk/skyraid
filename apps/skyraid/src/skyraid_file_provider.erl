@@ -13,7 +13,7 @@
 
 -callback put(session(), path(), binary(), opts()) -> ok | {error, term()}.
 -callback get(session(), path(), opts()) -> {ok, binary()} | {error, term()}.
--callback list(session()) -> {ok, [skr_file_info()]} | {error, term()}.
+-callback list(session(), path()) -> {ok, [skr_file_info()]} | {error, term()}.
 
 -callback mkdir(session(), path()) -> {ok, skr_file_info()} | {error, term}.
 -callback copy(session(), path(), path()) -> {ok, skr_file_info()} | {error, term()}.

@@ -95,4 +95,5 @@ add_account_normal() ->
 file_list_normal() ->
 	{ok, Session} = skyraid:login(<<"Adam">>, <<"test">>),
 	AccountID = "0",
-	{ok, [#skr_file_info{}|_Rest]} = skyraid:file_list(Session, AccountID).
+	Dir = "/",
+	{ok, [#skr_file_info{}|_Rest]} = skyraid:file_list(Session, AccountID, Dir).

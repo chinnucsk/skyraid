@@ -5,7 +5,7 @@
 %% ====================================================================
 %% API functions
 %% ====================================================================
--export([open/4, close/2, write/3, read/2, put/5, get/4, list/2]).
+-export([open/4, close/2, write/3, read/2, put/5, get/4, list/3]).
 
 open(Session, AccountID, FileName, Opts) ->
     {ok, #skr_account{provider=Provider, authentication=Auth}} = skyraid_user_session:get_account(Session, AccountID),
@@ -40,7 +40,7 @@ get(Session, AccountID, FileName, Opts) ->
     {ok, ProviderModule} = skyraid_context:get_file_provider(Provider),
     ProviderModule:get(Auth, FileName, Opts).
 
-list(Session, AccountID) ->
+list(Session, AccountID, Path) ->
     {ok, #skr_account{provider=Provider, authentication=Auth}} = skyraid_user_session:get_account(Session, AccountID),
     {ok, ProviderModule} = skyraid_context:get_file_provider(Provider),
-    ProviderModule:list(Auth).
+    ProviderModule:list(Auth, Path).

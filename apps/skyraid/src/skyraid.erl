@@ -12,7 +12,7 @@
 	get_session/1,
     add_account/2,
 	add_account/3,
-	file_list/2,
+	file_list/3,
 	file_open/4,
 	file_close/2,
 	file_write/3,
@@ -87,8 +87,8 @@ add_account(SessionRef, #skr_account{}=A) ->
     {ok, LocalAccount} = skyraid_account_repo:new(A#skr_account{user_id=UserID}),
     skyraid_user_session:add_account(SessionRef, LocalAccount).
 
-file_list(SessionRef, AccountID) ->
-    skyraid_file:list(SessionRef, AccountID).
+file_list(SessionRef, AccountID, Path) ->
+    skyraid_file:list(SessionRef, AccountID, Path).
 
 -spec file_open(session_ref(), term(), string(), list()) -> {ok, file_ref()}.
 file_open(SessionRef, AccountID, FileName, Opts) ->

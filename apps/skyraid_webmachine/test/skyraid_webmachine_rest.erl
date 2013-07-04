@@ -6,7 +6,9 @@ get(URL) ->
 	rest_req(json, URL). 
 
 get(URL, Header) ->
-	rest_req(get, URL, Header, "application/json", "apa").
+	{ok, {{_V, ReturnCode, _R}, _H, ResponseBody}} = httpc:request(get, {URL, Header}, [],[]),
+	ResponseTerm = case ReturnCode of 200 -> mochijson2:decode(ResponseBody); Any -> Any end,
+	{ReturnCode, ResponseTerm}.
 
 rest_req(URL) ->
 	rest_req(json, URL).
